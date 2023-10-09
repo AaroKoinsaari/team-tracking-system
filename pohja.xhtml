@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fi" xmlns="http://www.w3.org/1999/xhtml" xml:lang="fi">
+    <head><!-- head-osan sisältöä ei saa muuttaa -->
+        <meta charset="utf-8"/>
+        <script src="vt3.js"></script>
+        <link rel="StyleSheet" href="tyylit.css" type="text/css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>VT3 - 2023 syksy</title>
+    </head>
+    <body><!-- Tämän tiedoston sisältöä saa muuttaa vapaasti tästä kommentista eteenpäin
+ Kirjoita mahdollisimman paljon valmista HTML-koodia ja luo javascriptilla dynaamisesti
+ vain tarpeelliset kuten leimaustapojen ja sarjojen valinta sekä joukkuelistaus
+  -->
+       <h1>Tulospalvelu</h1>
+
+<!-- Voit seuraavalla keskeneräisellä lomakkeella kokeilla miten lomakkeesi toimisi ilman javascript-käsittelyä. 
+Oikein muodostettu lomake antaa tuloksena jotain seuraavanlaista eli sarjan arvona on käytettävä sarjan
+tunnistetta
+nimi    =   foo
+sarja   =   123
+jasen   =   a
+jasen   =   b
+Valmis sovelluksesi ei saa enää sallia lomakkeen tietojen lähettämistä osoitteeseen
+https://appro.mit.jyu.fi/cgi-bin/view.cgi
+-->
+<form action="https://appro.mit.jyu.fi/cgi-bin/view.cgi" method="post">
+<label>Nimi <input type="text" name="nimi" value="" /></label>
+<!-- seuraavat sarjavalinnat pitää luoda datan perusteella eli niitä ei saa suoraan kirjoittaa tähän. Nämä
+ovat vain testaamista varten -->
+<label>2h <input type="radio" name="sarja" checked="" value="123" /></label>
+<label>4h <input type="radio" name="sarja" value="678" /></label>
+<label>8h <input type="radio" name="sarja" value="987" /></label>
+<label>Jäsen 1 <input type="text" name="jasen" value="" /></label>
+<label>Jäsen 2 <input type="text" name="jasen" value="" /></label>
+<input type="submit" value="Lisää uusi" />
+</form>
+
+<!-- Tästä eteenpäin sivun sisältöä ei saa muuttaa -->
+<!-- Sivun validoinnin voit tehdä milloin tahansa näppäinyhdistelmällä CTRL+ALT+V -->
+<script src="https://appro.mit.jyu.fi/tools/htmlinspector/html-inspector.js"></script>
+<script src="https://appro.mit.jyu.fi/tools/validator/validator.user.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.13.5/jshint.js"></script>
+<script src="https://appro.mit.jyu.fi/tools/jshint/jshint.user.js"></script>
+<script src="https://appro.mit.jyu.fi/tools/htmlinspector/htmlinspector-live.js"></script>
+</body>
+</html>
