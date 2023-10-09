@@ -6,7 +6,6 @@
 // ?reset=1
 // jolloin uusi data ladataan palvelimelta
 // Tätä saa tarvittaessa lisäviritellä
-
 let alustus = async function() {
      // luetaan sivun osoitteesta mahdollinen reset-parametri
      // https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
