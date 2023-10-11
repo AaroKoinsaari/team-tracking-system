@@ -73,16 +73,81 @@ let start = function(data) {
       sarjatContainer.appendChild(label);
     }
   }
+
+
+  function validoiKentat(form, fieldName) {
+    const fieldElements = form.elements[fieldName];
+  
+    for (let i = 0; i < fieldElements.length; i++) {
+      const value = fieldElements[i].value.trim();
+  
+      if (value === '') {
+        return false;
+      }
+    }
+  
+    return true;
+  }
+
+
+  function luoJaLisaaJoukkue(data, lomake) {
+    const uusiJoukkue = {
+      aika: 0,
+      jasenet: [],
+      joukkue: lomake["nimi"].value,
+      leimaustapa: [0],
+      matka: 0,
+      pisteet: 0,
+      rastileimaukset: [],
+      sarja: lomake["sarja"].value
+    };
+
+    const jasenKentat = lomake.elements["jasen"];
+
+    // Lisätään vain ei-tyhjät jäsenet taulukkoon
+    for (let i = 0; i < jasenKentat.length; i++) {
+      const jasen = jasenKentat[i].value;
+      if (jasen !== "") {
+        uusiJoukkue.jasenet.push(jasen);
+      }
+    }
+
+    data.joukkueet.push(uusiJoukkue);  // Lisätään tietorakenteeseen
+  }
+
   
   const lomake = document.forms[0];
   const sarjat = data.sarjat;
+  const submitButton = lomake.elements["submit"];  // Uuden joukkueen lisäyspainike
   
-  jarjestaJaLuoSarjat(sarjat);
-  
+  jarjestaJaLuoSarjat(sarjat);  // Luodaan sarjat listaus
 
+  // Tapahtumankäsittelijä joukkueen lisäämispainikkeelle
+  submitButton.addEventListener("click", function(event) {
+    event.preventDefault();  // Estetään lomakkeen automaattinen lähetys
 
-  
+    // Tarkistetaan, että kentät eivät ole tyhjiä tai whitespacea
+    const onkoKentatValideja = validoiKentat(lomake, "jasen");
 
+    // Tarkistetaan, että ainakin yksi jäsenkenttä on täytetty
+    let edesYksiKentta = false;
+    const jasenKentat = lomake.elements["jasen"];
+    for (let i = 0; i < jasenKentat.length; i++) {
+      if (jasenKentat[i].value.trim() !== '') {
+        edesYksiKentta = true;
+        break;
+      }
+    }
+
+    if (!edesYksiKentta || !onkoKentatValideja) {
+      jasenKentat[0].setCustomValidity("Joukkueella on oltava vähintään yksi jäsen");
+      jasenKentat[0].reportValidity();
+    }
+
+    // Täydennetään joukkueobjekti ja lisätään se tietorakenteeseen.
+    luoJaLisaaJoukkue(data, lomake);
+    lomake.reset();
+  });
 
 
   console.log(data);
