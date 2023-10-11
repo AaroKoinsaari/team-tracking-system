@@ -81,13 +81,13 @@ let start = function(data) {
     for (let i = 0; i < fieldElements.length; i++) {
       const value = fieldElements[i].value.trim();
   
-      if (value === '') {
-        return false;
+      if (value !== '') {
+        return true;  // Palautetaan true, jos on edes yksi ei-tyhjä kenttä
       }
     }
   
-    return true;
-  }
+    return false;
+  }  
 
 
   function luoJaLisaaJoukkue(data, lomake) {
@@ -99,7 +99,7 @@ let start = function(data) {
       matka: 0,
       pisteet: 0,
       rastileimaukset: [],
-      sarja: lomake["sarja"].value
+      sarja: Number(lomake["sarja"].value)  // Tulee merkkijonona, joten muutetaan numeroksi
     };
 
     const jasenKentat = lomake.elements["jasen"];
@@ -118,16 +118,18 @@ let start = function(data) {
   
   const lomake = document.forms[0];
   const sarjat = data.sarjat;
-  const submitButton = lomake.elements["submit"];  // Uuden joukkueen lisäyspainike
+  // const submitButton = lomake.elements["submit"];  // Uuden joukkueen lisäyspainike
   
   jarjestaJaLuoSarjat(sarjat);  // Luodaan sarjat listaus
 
   // Tapahtumankäsittelijä joukkueen lisäämispainikkeelle
-  submitButton.addEventListener("click", function(event) {
+  lomake.addEventListener("submit", function(event) {
     event.preventDefault();  // Estetään lomakkeen automaattinen lähetys
 
     // Tarkistetaan, että kentät eivät ole tyhjiä tai whitespacea
     const onkoKentatValideja = validoiKentat(lomake, "jasen");
+
+    // TODO: joukkueen nimen validointi
 
     // Tarkistetaan, että ainakin yksi jäsenkenttä on täytetty
     let edesYksiKentta = false;
@@ -147,12 +149,22 @@ let start = function(data) {
     // Täydennetään joukkueobjekti ja lisätään se tietorakenteeseen.
     luoJaLisaaJoukkue(data, lomake);
     lomake.reset();
+
+    // Asetetaan ensimmäinen radiobuttoni valituksi
+    const radioButtons = lomake.querySelectorAll('input[type="radio"]');
+    if (radioButtons.length > 0) {
+      radioButtons[0].checked = true;
+    }
+
+    localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
   });
+
+
 
 
   console.log(data);
   // tallenna data sen mahdollisten muutosten jälkeen aina localStorageen seuraavalla tavalla:
-  // localStorage.setItem("TIEA2120-vt3-2023", JSON.stringify(data));
+  // localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));
   // kts ylempää mallia
   // varmista, että sovellus toimii oikein omien tallennusten jälkeenkin
   // eli näyttää sivun uudelleen lataamisen jälkeen edelliset lisäykset ja muutokset
