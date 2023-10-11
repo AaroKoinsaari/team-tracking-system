@@ -25,17 +25,39 @@
         Valmis sovelluksesi ei saa enää sallia lomakkeen tietojen lähettämistä osoitteeseen
         https://appro.mit.jyu.fi/cgi-bin/view.cgi
         -->
-        <form action="https://appro.mit.jyu.fi/cgi-bin/view.cgi" method="post">
-            <label>Nimi <input type="text" name="nimi" value="" /></label>
-            <!-- seuraavat sarjavalinnat pitää luoda datan perusteella eli niitä ei saa suoraan kirjoittaa tähän. Nämä
-            ovat vain testaamista varten -->
-            <label>2h <input type="radio" name="sarja" checked="" value="123" /></label>
-            <label>4h <input type="radio" name="sarja" value="678" /></label>
-            <label>8h <input type="radio" name="sarja" value="987" /></label>
-            <label>Jäsen 1 <input type="text" name="jasen" value="" /></label>
-            <label>Jäsen 2 <input type="text" name="jasen" value="" /></label>
-            <input type="submit" value="Lisää uusi" />
-        </form>
+        <div class="container">
+            <form action="https://appro.mit.jyu.fi/cgi-bin/view.cgi" method="post">
+              <div class="section">
+                <h2>Joukkueen tiedot</h2>
+                <div class="label-container">
+                  <span>Nimi</span>
+                  <input type="text" name="nimi" value="" />
+                </div>
+              </div>
+          
+              <div class="section">
+                <div id="sarjatContainer">
+                  <div class="label-container">
+                    <span>Sarjat</span>
+                    <!--Tähän tulee sarjavalinnat-->
+                  </div>
+                </div>
+                <div class="label-container">
+                  <span>Jäsen 1</span>
+                  <input type="text" name="jasen" value="" />
+                </div>
+                <div class="label-container">
+                  <span>Jäsen 2</span>
+                  <input type="text" name="jasen" value="" />
+                </div>
+                <input type="submit" value="Lisää uusi" />
+              </div>
+            </form>
+          </div>
+          
+          
+          
+          
 
         <!-- Tästä eteenpäin sivun sisältöä ei saa muuttaa -->
         <!-- Sivun validoinnin voit tehdä milloin tahansa näppäinyhdistelmällä CTRL+ALT+V -->
