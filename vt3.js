@@ -47,6 +47,69 @@ window.addEventListener("load", alustus);
 // oma sovelluskoodi voidaan sijoittaa tähän funktioon
 let start = function(data) {
   // tänne oma koodi
+
+
+  // function sortRadiosAlphabetically() {
+  //   // Etsitään kaikki radiobuttonit lomakkeesta
+  //   const form = document.querySelector('form');
+  //   const allLabels = Array.from(form.querySelectorAll('label'));
+    
+  //   // Filtteröidään vain radiobuttonien label-elementit
+  //   const radioLabels = allLabels.filter(label => label.querySelector('input[type="radio"]'));
+  
+  //   // Järjestetään radiobuttonit aakkosjärjestykseen labelin mukaan
+  //   radioLabels.sort((a, b) => {
+  //     const textA = a.textContent.trim();
+  //     const textB = b.textContent.trim();
+  //     return textA.localeCompare(textB);
+  //   });
+  
+  //   // Poistetaan vanhat radiobuttonit lomakkeesta ja lisätään järjestettynä takaisin
+  //   radioLabels.forEach(label => form.removeChild(label));
+  //   radioLabels.forEach(label => form.appendChild(label));
+  // }
+  
+
+  // sortRadiosAlphabetically();
+
+
+  function jarjestaJaLuoSarjat(lomake, sarjatData) {
+    // Järjestetään sarjat aakkosjärjestykseen
+    sarjatData.sort((a, b) => a.sarja.localeCompare(b.sarja));
+  
+    // Etsi div, johon sarja-radiobuttonit lisätään
+    const sarjatContainer = document.getElementById('sarjatContainer');
+  
+    // Luodaan uudet järjestetyt radiobuttonit
+    for (const [index, sarja] of sarjatData.entries()) {
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'sarja';
+      input.value = sarja.id;
+  
+      // Ensimmäinen valitaan oletuksena
+      if (index === 0) {
+        input.checked = true;
+      }
+  
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(' ' + sarja.sarja));
+      sarjatContainer.appendChild(label);
+    }
+  }
+  
+  const lomake = document.forms[0];
+  const sarjat = data.sarjat;
+  
+  jarjestaJaLuoSarjat(lomake, sarjat);
+  
+
+
+  
+
+
+
   console.log(data);
   // tallenna data sen mahdollisten muutosten jälkeen aina localStorageen seuraavalla tavalla:
   // localStorage.setItem("TIEA2120-vt3-2023", JSON.stringify(data));
