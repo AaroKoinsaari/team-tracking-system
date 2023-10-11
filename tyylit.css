@@ -2,3 +2,8 @@ body {
    background-color: white;
    color: black;
 }
+
+#sarjatContainer {
+   display: flex;
+   flex-direction: column;
+}
