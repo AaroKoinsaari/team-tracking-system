@@ -46,16 +46,12 @@ window.addEventListener("load", alustus);
 
 // oma sovelluskoodi voidaan sijoittaa tähän funktioon
 let start = function(data) {
-  // tänne oma koodi
 
   function jarjestaJaLuoSarjat(sarjatData) {
-    // Järjestetään sarjat aakkosjärjestykseen
-    sarjatData.sort((a, b) => a.sarja.localeCompare(b.sarja));
-  
-    // Etsi div, johon sarja-radiobuttonit lisätään
-    const sarjatContainer = document.getElementById('sarjatContainer');
+    sarjatData.sort((a, b) => a.sarja.localeCompare(b.sarja)); // Järjestetään aakkosjärjestykseen
   
     // Luodaan uudet järjestetyt radiobuttonit
+    const sarjatContainer = document.getElementById('sarjatContainer');
     for (const [index, sarja] of sarjatData.entries()) {
       const label = document.createElement('label');
       const input = document.createElement('input');
@@ -102,9 +98,8 @@ let start = function(data) {
       sarja: Number(lomake["sarja"].value)  // Tulee merkkijonona, joten muutetaan numeroksi
     };
 
-    const jasenKentat = lomake.elements["jasen"];
-
     // Lisätään vain ei-tyhjät jäsenet taulukkoon
+    const jasenKentat = lomake.elements["jasen"];
     for (let i = 0; i < jasenKentat.length; i++) {
       const jasen = jasenKentat[i].value;
       if (jasen !== "") {
@@ -137,46 +132,58 @@ let start = function(data) {
   const sarjat = data.sarjat;  
   jarjestaJaLuoSarjat(sarjat);  // Luodaan sarjat listaus
 
-  
-  // Lomakkeen input elementtien kuuntelija, jonka sisällä suoritetaan kenttien tarkistus reaaliaikaisesti
-  lomake.addEventListener('input',  function(event) {
-    const target = event.target;  // Määrittää, kumpaa input tapahtumaa tarkistetaan
-    const nimi = lomake.elements["nimi"];
-    const jasenKentat = lomake.elements["jasen"];
+  const submitPainike = lomake.elements["submit"];
+
+  // // Asettaa ensimmäisen radiobuttonin valituksi, kun lomake resetoidaan
+  // lomake.addEventListener('reset', function(event) {
+  //   const ensimmainenRadio = lomake.elements["sarja"][0];
+  //   if (ensimmainenRadio) {
+  //     ensimmainenRadio.checked = true;
+  //   }
+  // });  
+
+
+  // Tarkistetaan lomake jo click-tapahtumassa, jotta submit-tapahtumankäsittelijälle
+  // Lähetetään suoraan validi lomake
+  submitPainike.addEventListener('click',  function(event) {
+    console.log("Click-tapahtumankäsittelijä aktivoitu"); 
 
     // Tarkistetaan joukkueen nimi
-    if (target == nimi) {
-      const joukkueenNimiValidi = tarkistaJoukkueenNimi(data, nimi.value);
-      if (!joukkueenNimiValidi) {
-        nimi.setCustomValidity("Nimen on oltava uniikki ja vähintään kaksi merkkiä pitkä");
-      } else {
-        nimi.setCustomValidity("");  // Tyhjennetään virheilmoitukset
-      }
-      nimi.reportValidity();
-    } 
-    
+    const nimiKentta = lomake.elements["nimi"];
+    const joukkueenNimiValidi = tarkistaJoukkueenNimi(data, nimiKentta.value);
+    if (!joukkueenNimiValidi) {
+      nimiKentta.setCustomValidity("Joukkueen nimen on uniikki ja vähintään kaksi merkkiä pitkä");
+      nimiKentta.reportValidity();
+      event.preventDefault();  // Estetään lähetys epäonnistuessa
+      return;
+    }
+    nimiKentta.setCustomValidity("");  // Tyhjennetään virheilmoitukset
+
     // Tarkistetaan jäsenkentät
-    else if (target.name === "jasen") {
-      const jasenKentatValideja = validoiKentat(lomake, "jasen");
-      if (!jasenKentatValideja) {
-        target.setCustomValidity("Joukkueella on oltava vähintään yksi jäsen");
-      } else {
-        target.setCustomValidity("");  // Tyhjennetään virheilmoitukset
+    const jasenKentta = lomake.elements["jasen"];
+    const jasenetValidit = validoiKentat(lomake, "jasen");
+    if (!jasenetValidit) {
+      for (let kentta of jasenKentta) {
+        kentta.setCustomValidity("Joukkueella on oltava vähintään yksi jäsen");
       }
-      target.reportValidity();
+      jasenKentta[0].reportValidity();  // Toinen kentistä riittää virheilmoitukseen
+      event.preventDefault();  // Estetään lähetys epäonnistuessa
+      return;
+    }
+    for (let kentta of jasenKentta) {
+      kentta.setCustomValidity("");  // Tyhjennetään virheilmoitukset
     }
   });
 
 
   // Tapahtumankäsittelijä joukkueen lisäämispainikkeelle
   lomake.addEventListener("submit", function(event) {
+    console.log("Submit-tapahtumankäsittelijä aktivoitu"); 
     event.preventDefault();  // Estetään lomakkeen automaattinen lähetys
 
     // Täydennetään joukkueobjekti ja lisätään se tietorakenteeseen.
     luoJaLisaaJoukkue(data, lomake);
     lomake.reset();
-
-    // TODO: Radiobuttonin asetus document.forms käyttäen
 
     localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
   });
