@@ -115,6 +115,23 @@ let start = function(data) {
     data.joukkueet.push(uusiJoukkue);  // Lisätään tietorakenteeseen
   }
 
+
+  function tarkistaJoukkueenNimi(data, fieldName) {
+    const nimiValue = fieldName.trim();
+    if (nimiValue.length < 2) {
+      return false;
+    }
+
+    // Tarkistetaan, että nimi on uniikki
+    for (let j of data.joukkueet) {
+      if (j.joukkue == nimiValue) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   
   const lomake = document.forms[0];
   const sarjat = data.sarjat;
@@ -127,9 +144,17 @@ let start = function(data) {
     event.preventDefault();  // Estetään lomakkeen automaattinen lähetys
 
     // Tarkistetaan, että kentät eivät ole tyhjiä tai whitespacea
-    const onkoKentatValideja = validoiKentat(lomake, "jasen");
+    const jasenKentatValideja = validoiKentat(lomake, "jasen");
 
-    // TODO: joukkueen nimen validointi
+    // Tarkistetaan joukkueen nimi
+    const nimiKentta = lomake.elements["nimi"];
+    const joukkueenNimiValidi = tarkistaJoukkueenNimi(data, nimiKentta.value);
+    if (!joukkueenNimiValidi) {
+      nimiKentta.setCustomValidity("Nimen on oltava uniikki ja vähintään kaksi merkkiä");
+      nimiKentta.reportValidity();
+      return;
+    }
+    nimiKentta.setCustomValidity("");  // Tyhjennetään aiemmat virheilmoitukset
 
     // Tarkistetaan, että ainakin yksi jäsenkenttä on täytetty
     let edesYksiKentta = false;
@@ -141,7 +166,7 @@ let start = function(data) {
       }
     }
 
-    if (!edesYksiKentta || !onkoKentatValideja) {
+    if (!edesYksiKentta || !jasenKentatValideja) {
       jasenKentat[0].setCustomValidity("Joukkueella on oltava vähintään yksi jäsen");
       jasenKentat[0].reportValidity();
     }
@@ -151,10 +176,11 @@ let start = function(data) {
     lomake.reset();
 
     // Asetetaan ensimmäinen radiobuttoni valituksi
-    const radioButtons = lomake.querySelectorAll('input[type="radio"]');
-    if (radioButtons.length > 0) {
-      radioButtons[0].checked = true;
-    }
+    // TODO: Korjaa document.forms käyttäen
+    // const radioButtons = lomake.querySelectorAll('input[type="radio"]');
+    // if (radioButtons.length > 0) {
+    //   radioButtons[0].checked = true;
+    // }
 
     localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
   });
