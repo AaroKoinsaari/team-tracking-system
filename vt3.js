@@ -134,53 +134,49 @@ let start = function(data) {
 
   
   const lomake = document.forms[0];
-  const sarjat = data.sarjat;
-  // const submitButton = lomake.elements["submit"];  // Uuden joukkueen lisäyspainike
-  
+  const sarjat = data.sarjat;  
   jarjestaJaLuoSarjat(sarjat);  // Luodaan sarjat listaus
+
+  
+  // Lomakkeen input elementtien kuuntelija, jonka sisällä suoritetaan kenttien tarkistus reaaliaikaisesti
+  lomake.addEventListener('input',  function(event) {
+    const target = event.target;  // Määrittää, kumpaa input tapahtumaa tarkistetaan
+    const nimi = lomake.elements["nimi"];
+    const jasenKentat = lomake.elements["jasen"];
+
+    // Tarkistetaan joukkueen nimi
+    if (target == nimi) {
+      const joukkueenNimiValidi = tarkistaJoukkueenNimi(data, nimi.value);
+      if (!joukkueenNimiValidi) {
+        nimi.setCustomValidity("Nimen on oltava uniikki ja vähintään kaksi merkkiä pitkä");
+      } else {
+        nimi.setCustomValidity("");  // Tyhjennetään virheilmoitukset
+      }
+      nimi.reportValidity();
+    } 
+    
+    // Tarkistetaan jäsenkentät
+    else if (target.name === "jasen") {
+      const jasenKentatValideja = validoiKentat(lomake, "jasen");
+      if (!jasenKentatValideja) {
+        target.setCustomValidity("Joukkueella on oltava vähintään yksi jäsen");
+      } else {
+        target.setCustomValidity("");  // Tyhjennetään virheilmoitukset
+      }
+      target.reportValidity();
+    }
+  });
+
 
   // Tapahtumankäsittelijä joukkueen lisäämispainikkeelle
   lomake.addEventListener("submit", function(event) {
     event.preventDefault();  // Estetään lomakkeen automaattinen lähetys
 
-    // Tarkistetaan, että kentät eivät ole tyhjiä tai whitespacea
-    const jasenKentatValideja = validoiKentat(lomake, "jasen");
-
-    // Tarkistetaan joukkueen nimi
-    const nimiKentta = lomake.elements["nimi"];
-    const joukkueenNimiValidi = tarkistaJoukkueenNimi(data, nimiKentta.value);
-    if (!joukkueenNimiValidi) {
-      nimiKentta.setCustomValidity("Nimen on oltava uniikki ja vähintään kaksi merkkiä");
-      nimiKentta.reportValidity();
-      return;
-    }
-    nimiKentta.setCustomValidity("");  // Tyhjennetään aiemmat virheilmoitukset
-
-    // Tarkistetaan, että ainakin yksi jäsenkenttä on täytetty
-    let edesYksiKentta = false;
-    const jasenKentat = lomake.elements["jasen"];
-    for (let i = 0; i < jasenKentat.length; i++) {
-      if (jasenKentat[i].value.trim() !== '') {
-        edesYksiKentta = true;
-        break;
-      }
-    }
-
-    if (!edesYksiKentta || !jasenKentatValideja) {
-      jasenKentat[0].setCustomValidity("Joukkueella on oltava vähintään yksi jäsen");
-      jasenKentat[0].reportValidity();
-    }
-
     // Täydennetään joukkueobjekti ja lisätään se tietorakenteeseen.
     luoJaLisaaJoukkue(data, lomake);
     lomake.reset();
 
-    // Asetetaan ensimmäinen radiobuttoni valituksi
-    // TODO: Korjaa document.forms käyttäen
-    // const radioButtons = lomake.querySelectorAll('input[type="radio"]');
-    // if (radioButtons.length > 0) {
-    //   radioButtons[0].checked = true;
-    // }
+    // TODO: Radiobuttonin asetus document.forms käyttäen
 
     localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
   });
