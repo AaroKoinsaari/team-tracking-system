@@ -47,6 +47,12 @@ window.addEventListener("load", alustus);
 // oma sovelluskoodi voidaan sijoittaa tähän funktioon
 let start = function(data) {
 
+  /**
+   * Järjestää sarjat aakkosjärjestykseen ja luo HTML-radiobuttonit niille.
+   * Ensimmäinen radiobutton valitaan oletuksena.
+   *
+   * @param {Array<Object>} sarjatData - Taulukko sarjoista, joka sisältää sarjojen nimet ja ID:t.
+   */
   function jarjestaJaLuoSarjat(sarjatData) {
     sarjatData.sort((a, b) => a.sarja.localeCompare(b.sarja)); // Järjestetään aakkosjärjestykseen
   
@@ -71,6 +77,13 @@ let start = function(data) {
   }
 
 
+  /**
+   * Tarkistaa, että annetussa lomake-elementissä on edes yksi ei-tyhjä kenttä.
+   *
+   * @param {HTMLFormElement} form - Lomake-elementti, jossa kentät sijaitsevat.
+   * @param {string} fieldName - Kentän nimi, jota halutaan tarkistaa.
+   * @returns {boolean} true jos vähintään yksi kenttä ei ole tyhjä, muutoin false.
+   */
   function validoiKentat(form, fieldName) {
     const fieldElements = form.elements[fieldName];
   
@@ -86,6 +99,12 @@ let start = function(data) {
   }  
 
 
+  /**
+   * Luo uuden joukkue-objektin ja lisää sen annettuun tietorakenteeseen.
+   *
+   * @param {Object} data - Tietorakenne, johon uusi joukkue lisätään.
+   * @param {HTMLFormElement} lomake - Lomake-elementti, josta uuden joukkueen tiedot otetaan.
+   */
   function luoJaLisaaJoukkue(data, lomake) {
     const uusiJoukkue = {
       aika: 0,
@@ -111,15 +130,22 @@ let start = function(data) {
   }
 
 
+  /**
+   * Tarkistaa onko annettu joukkueen nimi uniikki ja vähintään 2 merkkiä pitkä.
+   *
+   * @param {Object} data - Tietorakenne, joka sisältää kaikki joukkueet.
+   * @param {string} fieldName - Tarkistettavan joukkueen nimi.
+   * @returns {boolean} - true, jos nimi on kelvollinen ja uniikki. Muutoin false.
+   */
   function tarkistaJoukkueenNimi(data, fieldName) {
-    const nimiValue = fieldName.trim();
+    const nimiValue = fieldName.trim().toLowerCase();
     if (nimiValue.length < 2) {
       return false;
     }
 
     // Tarkistetaan, että nimi on uniikki
     for (let j of data.joukkueet) {
-      if (j.joukkue == nimiValue) {
+      if (j.joukkue.trim().toLowerCase() == nimiValue) {
         return false;
       }
     }
@@ -129,22 +155,18 @@ let start = function(data) {
 
   
   const lomake = document.forms[0];
-  const sarjat = data.sarjat;  
-  jarjestaJaLuoSarjat(sarjat);  // Luodaan sarjat listaus
-
+  const sarjat = data.sarjat;
   const submitPainike = lomake.elements["submit"];
 
-  // // Asettaa ensimmäisen radiobuttonin valituksi, kun lomake resetoidaan
-  // lomake.addEventListener('reset', function(event) {
-  //   const ensimmainenRadio = lomake.elements["sarja"][0];
-  //   if (ensimmainenRadio) {
-  //     ensimmainenRadio.checked = true;
-  //   }
-  // });  
+  jarjestaJaLuoSarjat(sarjat);  // Luodaan sarjojen listaus
 
-
-  // Tarkistetaan lomake jo click-tapahtumassa, jotta submit-tapahtumankäsittelijälle
-  // Lähetetään suoraan validi lomake
+  /**
+   * Käsittelee click-tapahtuman.
+   * Tarkistaa joukkueen nimen ja jäsenten kentät. Jos tarkistukset epäonnistuvat,
+   * funktio estää lomakkeen lähettämisen ja asettaa virheilmoituksen.
+   *
+   * @param {Event} event - click-tapahtuman tiedot.
+   */
   submitPainike.addEventListener('click',  function(event) {
     console.log("Click-tapahtumankäsittelijä aktivoitu"); 
 
@@ -176,22 +198,28 @@ let start = function(data) {
   });
 
 
-  // Tapahtumankäsittelijä joukkueen lisäämispainikkeelle
+  /**
+   * Tapahtumankäsittelijä lomakkeen submit-tapahtumalle.
+   * Estää lomakkeen automaattisen lähettämisen, täydentää joukkueobjektin,
+   * lisää sen tietorakenteeseen, ja tallentaa päivitetyn datan LocalStorageen.
+   *
+   * @param {Event} event - submit-tapahtuman tiedot.
+   */
   lomake.addEventListener("submit", function(event) {
     console.log("Submit-tapahtumankäsittelijä aktivoitu"); 
     event.preventDefault();  // Estetään lomakkeen automaattinen lähetys
 
-    // Täydennetään joukkueobjekti ja lisätään se tietorakenteeseen.
-    luoJaLisaaJoukkue(data, lomake);
+    luoJaLisaaJoukkue(data, lomake);  // Täydentää joukkueobjektin
     lomake.reset();
+
+    // Asetetaan ensimmäinen sarja valituksi resetoinnin jälkeen
+    lomake.elements["sarja"][0].checked = true;
 
     localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
   });
 
-
-
-
   console.log(data);
+  
   // tallenna data sen mahdollisten muutosten jälkeen aina localStorageen seuraavalla tavalla:
   // localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));
   // kts ylempää mallia
@@ -199,6 +227,4 @@ let start = function(data) {
   // eli näyttää sivun uudelleen lataamisen jälkeen edelliset lisäykset ja muutokset
   // resetoi rakenne tarvittaessa lisäämällä sivun osoitteen perään ?reset=1
   // esim. http://users.jyu.fi/~omatunnus/TIEA2120/vt2/pohja.xhtml?reset=1
-
 };
-
