@@ -25,39 +25,33 @@
         Valmis sovelluksesi ei saa enää sallia lomakkeen tietojen lähettämistä osoitteeseen
         https://appro.mit.jyu.fi/cgi-bin/view.cgi
         -->
-        <div class="container">
-            <form action="https://appro.mit.jyu.fi/cgi-bin/view.cgi" method="post">
-              <div class="section">
-                <h2>Joukkueen tiedot</h2>
-                <div class="label-container">
-                  <span>Nimi</span>
-                  <input type="text" name="nimi" value="" />
-                </div>
+        <form action="https://appro.mit.jyu.fi/cgi-bin/view.cgi" method="post">
+          <span>Joukkueen tiedot</span>
+          <div class="section">
+            <div class="label-container">
+              <span>Nimi</span>
+              <input type="text" name="nimi" value="" />
+            </div>
+            <div class="label-container">
+              <span>Sarjat</span> 
+              <div id="sarjatContainer">
+                <!-- Tähän tulee sarjavalinnat -->
               </div>
-          
-              <div class="section">
-                <div id="sarjatContainer">
-                  <div class="label-container">
-                    <span>Sarjat</span>
-                    <!-- Tähän tulee sarjavalinnat -->
-                  </div>
-                </div>
-                <div class="label-container">
-                  <span>Jäsen 1</span>
-                  <input type="text" name="jasen" value="" />
-                </div>
-                <div class="label-container">
-                  <span>Jäsen 2</span>
-                  <input type="text" name="jasen" value="" />
-                </div>
-                <input type="submit" name="submit" value="Lisää uusi" />
-              </div>
-            </form>
-            <ul id="joukkueLista">
-              <!-- Tähän tulee joukkuelistaus -->
-            </ul>
+            </div>
           </div>
-          
+            <div class="label-container">
+              <span>Jäsen 1</span>
+              <input type="text" name="jasen" value="" />
+            </div>
+            <div class="label-container">
+              <span>Jäsen 2</span>
+              <input type="text" name="jasen" value="" />
+            </div>
+            <input type="submit" name="submit" value="Lisää uusi" />
+        </form>
+        <ul id="joukkueLista">
+          <!-- Tähän tulee joukkuelistaus -->
+        </ul>
           
           
           
