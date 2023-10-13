@@ -77,6 +77,49 @@ let start = function(data) {
   }
 
 
+  function paivitaJoukkueLista(joukkueLista) {
+
+    // Poistetaan mahdollinen vanha listaus
+    const vanhaUl = document.getElementById("joukkueLista");
+    if (vanhaUl) {
+      vanhaUl.remove();
+    }
+
+    // Luodaan uusi ul-elementti
+    const ul = document.createElement('ul');
+    ul.id = 'joukkueLista';
+
+    // Käydään läpi järjestetty lista joukkueista
+    for (const joukkue of joukkueLista) {
+      const li = document.createElement('li');
+      li.textContent = '${joukkue.joukkue}';
+
+      // Luodaan sisäkkäinen ul-elementti jokaiselle joukkueen jäsenelle
+      const sisakkainenUl = document.createElement('ul');
+      for (const jasen of joukkue.jasenet) {
+        const jasenLi = document.createElement('li');
+        jasenLi.textContent = jasen;
+        sisakkainenUl.appendChild(jasenLi);
+      }
+
+      li.appendChild(sisakkainenUl);
+      ul.appendChild(li);
+    }
+
+    document.body.appendChild(ul);
+  }
+
+
+  function jarjestaJoukkueet(joukkueet) {
+    return joukkueet.sort((a, b) => a.joukkue.localeCompare(b.joukkue));
+  }
+
+
+  function jarjestaJasenet(joukkue) {
+    joukkue.jasenet.sort((a, b) => a.localeCompare(b));
+  }
+
+
   /**
    * Tarkistaa, että annetussa lomake-elementissä on edes yksi ei-tyhjä kenttä.
    *
@@ -157,8 +200,18 @@ let start = function(data) {
   const lomake = document.forms[0];
   const sarjat = data.sarjat;
   const submitPainike = lomake.elements["submit"];
+  const joukkueLista = lomake.elements["joukkueLista"];
+
+  const jarjestetytJoukkueet = jarjestaJoukkueet(data.joukkueet);
+
+  for (const joukkue of jarjestetytJoukkueet) {
+    jarjestaJasenet(joukkue);
+  }
+
+  paivitaJoukkueLista(jarjestetytJoukkueet);
 
   jarjestaJaLuoSarjat(sarjat);  // Luodaan sarjojen listaus
+  paivitaJoukkueLista();
 
   /**
    * Käsittelee click-tapahtuman.
