@@ -67,7 +67,7 @@ let start = function(data) {
   
       // Ensimmäinen valitaan oletuksena
       if (index === 0) {
-        input.checked = true;
+        input.setAttribute("checked", "checked");
       }
   
       label.appendChild(input);
@@ -212,14 +212,11 @@ let start = function(data) {
     luoJaLisaaJoukkue(data, lomake);  // Täydentää joukkueobjektin
     lomake.reset();
 
-    // Asetetaan ensimmäinen sarja valituksi resetoinnin jälkeen
-    lomake.elements["sarja"][0].checked = true;
-
     localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
   });
 
   console.log(data);
-  
+
   // tallenna data sen mahdollisten muutosten jälkeen aina localStorageen seuraavalla tavalla:
   // localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));
   // kts ylempää mallia
