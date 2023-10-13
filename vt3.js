@@ -77,7 +77,9 @@ let start = function(data) {
   }
 
 
-  function paivitaJoukkueLista(joukkueLista) {
+  function paivitaJoukkueLista(data) {
+
+    const joukkueet = jarjestaJoukkueet(data.joukkueet);
 
     // Poistetaan mahdollinen vanha listaus
     const vanhaUl = document.getElementById("joukkueLista");
@@ -90,19 +92,27 @@ let start = function(data) {
     ul.id = 'joukkueLista';
 
     // Käydään läpi järjestetty lista joukkueista
-    for (const joukkue of joukkueLista) {
+    for (const joukkue of joukkueet) {
+      jarjestaJasenet(joukkue);
       const li = document.createElement('li');
-      li.textContent = '${joukkue.joukkue}';
+      li.textContent = joukkue.joukkue + " ";
+
+
+      // Lisätään joukkueelle sarja
+      const strong = document.createElement('strong');
+      const sarja = data.sarjat.find(s => s.id === joukkue.sarja);
+      strong.textContent = sarja ? sarja.sarja : 'Tuntematon sarja';
+      li.appendChild(strong);
 
       // Luodaan sisäkkäinen ul-elementti jokaiselle joukkueen jäsenelle
-      const sisakkainenUl = document.createElement('ul');
+      const sisempiUl = document.createElement('ul');
       for (const jasen of joukkue.jasenet) {
-        const jasenLi = document.createElement('li');
-        jasenLi.textContent = jasen;
-        sisakkainenUl.appendChild(jasenLi);
+        const sisempiLi = document.createElement('li');
+        sisempiLi.textContent = jasen;
+        sisempiUl.appendChild(sisempiLi);
       }
 
-      li.appendChild(sisakkainenUl);
+      li.appendChild(sisempiUl);
       ul.appendChild(li);
     }
 
@@ -200,18 +210,9 @@ let start = function(data) {
   const lomake = document.forms[0];
   const sarjat = data.sarjat;
   const submitPainike = lomake.elements["submit"];
-  const joukkueLista = lomake.elements["joukkueLista"];
-
-  const jarjestetytJoukkueet = jarjestaJoukkueet(data.joukkueet);
-
-  for (const joukkue of jarjestetytJoukkueet) {
-    jarjestaJasenet(joukkue);
-  }
-
-  paivitaJoukkueLista(jarjestetytJoukkueet);
 
   jarjestaJaLuoSarjat(sarjat);  // Luodaan sarjojen listaus
-  paivitaJoukkueLista();
+  paivitaJoukkueLista(data);
 
   /**
    * Käsittelee click-tapahtuman.
@@ -266,6 +267,8 @@ let start = function(data) {
     lomake.reset();
 
     localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
+
+    paivitaJoukkueLista(data);
   });
 
   console.log(data);
