@@ -64,14 +64,15 @@ let start = function(data) {
       input.type = 'radio';
       input.name = 'sarja';
       input.value = sarja.id;
+
+      label.appendChild(document.createTextNode(' ' + sarja.sarja));
+      label.appendChild(input);
   
       // Ensimmäinen valitaan oletuksena
       if (index === 0) {
         input.setAttribute("checked", "checked");
       }
   
-      label.appendChild(input);
-      label.appendChild(document.createTextNode(' ' + sarja.sarja));
       sarjatContainer.appendChild(label);
     }
   }
@@ -101,7 +102,7 @@ let start = function(data) {
       // Lisätään joukkueelle sarja
       const strong = document.createElement('strong');
       const sarja = data.sarjat.find(s => s.id === joukkue.sarja);
-      strong.textContent = sarja ? sarja.sarja : 'Tuntematon sarja';
+      strong.textContent = sarja.sarja;
       li.appendChild(strong);
 
       // Luodaan sisäkkäinen ul-elementti jokaiselle joukkueen jäsenelle
