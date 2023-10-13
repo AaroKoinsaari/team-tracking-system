@@ -1,9 +1,48 @@
 body {
-   background-color: white;
-   color: black;
-}
-
-#sarjatContainer {
-   display: flex;
-   flex-direction: column;
-}
+    background-color: white;
+    color: black;
+ }
+ 
+ form {
+     width: 30rem;
+ }  
+ 
+ .label-container {
+     display: flex;
+     flex-direction: row;
+     justify-content: space-between; 
+     align-items: flex-start;
+     margin-bottom: 0.5rem;
+     width: 100%;
+ }
+ 
+ .label-container span {
+     flex: 1; 
+ }
+ 
+ .label-container input[type="text"], 
+ .label-container label {
+     flex: 0 0 50%; 
+ }
+ 
+ #sarjatContainer {
+     display: flex;
+     flex-direction: column;
+ }
+ 
+ #sarjatContainer label {
+     display: flex;
+     justify-content: flex-end;
+     align-items: center; 
+ }
+ 
+ #sarjatContainer span {
+     flex-grow: 1;
+     text-align: right;
+ }
+ 
+ .label-container input[type="radio"] {
+     margin-left: 0.5rem;
+     order: 2;
+ }
+ 
