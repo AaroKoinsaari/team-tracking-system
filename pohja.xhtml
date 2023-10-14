@@ -26,8 +26,8 @@
         https://appro.mit.jyu.fi/cgi-bin/view.cgi
         -->
         <form action="https://appro.mit.jyu.fi/cgi-bin/view.cgi" method="post">
-          <span id="joukkue-section-header">Joukkueen tiedot</span>
-          <div class="section">
+          <fieldset class="section">
+            <legend>Joukkueen tiedot</legend>
             <div class="label-container">
               <span>Nimi</span>
               <input type="text" name="nimi" value="" />
@@ -38,9 +38,9 @@
                 <!-- Tähän tulee sarjavalinnat -->
               </div>
             </div>
-          </div>
-          <span id="jasenet-section-header">Jäsenet</span>
-          <div class="section">
+          </fieldset>
+          <fieldset class="section">
+            <legend>Jäsenet</legend>
             <div class="label-container">
               <span>Jäsen 1</span>
               <input type="text" name="jasen" value="" />
@@ -49,7 +49,7 @@
               <span>Jäsen 2</span>
               <input type="text" name="jasen" value="" />
             </div>
-          </div>
+          </fieldset>
           <input type="submit" name="submit" value="Lisää uusi" />
         </form>
         <ul id="joukkueLista">
