@@ -5,7 +5,34 @@ body {
  
  form {
      width: 30rem;
- }  
+     align-items: baseline;
+ }
+
+ .section {
+	border: 1px solid #9e9e9e;
+	padding: 10px;
+	margin-left: 5px;
+    margin-top: 15px;
+	position: relative;
+}
+
+ #joukkue-section-header {
+	position: absolute;
+	top: 72px;
+	left: 35px;
+	background-color: white;
+	padding: 0 5px;
+	z-index: 1;
+}
+
+#jasenet-section-header {
+	position: absolute;
+	top: 275px;
+	left: 35px;
+	background-color: white;
+	padding: 0 5px;
+	z-index: 1;
+}
  
  .label-container {
      display: flex;
@@ -13,7 +40,12 @@ body {
      justify-content: space-between; 
      align-items: flex-start;
      margin-bottom: 0.5rem;
+     margin-top: 0.5rem;
      width: 100%;
+ }
+
+ #sarjat {
+    padding-top: 1.5rem;
  }
  
  .label-container span {
@@ -45,4 +77,7 @@ body {
      margin-left: 0.5rem;
      order: 2;
  }
- 
+
+ input[type="submit"] {
+	margin-top: 0.1rem;
+}
