@@ -78,6 +78,36 @@ let start = function(data) {
   }
 
 
+  /**
+   * Järjestää ja luo leimaustavat sivun lomakkeelle.
+   *
+   * @param {Array} leimaustavatData - Leimaustavat taulukossa.
+   */
+  function jarjestaJaLuoLeimaustavat(leimaustavatData) {
+    leimaustavatData.sort((a, b) => a.localeCompare(b));  // Järjestetään aakkosjärjestykseen
+
+    const leimaustavatContainer = document.getElementById('leimaustavatContainer');
+
+    for (const [index, leimaustapa] of leimaustavatData.entries()) {
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.name = 'leimaustapa';
+      input.value = index;
+
+      label.appendChild(document.createTextNode(' ' + leimaustapa));
+      label.appendChild(input);
+
+      leimaustavatContainer.appendChild(label);
+    }
+  }
+
+
+  /**
+   * Päivittää joukkueiden listan sivulla korvaamalla mahdollisen vanhan listauksen uudella
+   *
+   * @param {Object} data - Tietorakenne, jossa joukkueet ovat.
+   */
   function paivitaJoukkueLista(data) {
 
     const joukkueet = jarjestaJoukkueet(data.joukkueet);
@@ -121,11 +151,22 @@ let start = function(data) {
   }
 
 
+  /**
+   * Järjestää joukkueet aakkosjärjestykseen nimen perusteella
+   * 
+   * @param {Object} joukkueet 
+   * @returns Lista joukkueista aakkosjärjestyksessä
+   */
   function jarjestaJoukkueet(joukkueet) {
     return joukkueet.sort((a, b) => a.joukkue.localeCompare(b.joukkue));
   }
 
 
+  /**
+   * Järjestää joukkueiden jäsenet aakkosjärjestykseen
+   * 
+   * @param {Object} joukkue Joukkueobjekti
+   */
   function jarjestaJasenet(joukkue) {
     joukkue.jasenet.sort((a, b) => a.localeCompare(b));
   }
@@ -164,7 +205,7 @@ let start = function(data) {
       aika: 0,
       jasenet: [],
       joukkue: lomake["nimi"].value,
-      leimaustapa: [0],
+      leimaustapa: [],
       matka: 0,
       pisteet: 0,
       rastileimaukset: [],
@@ -177,6 +218,14 @@ let start = function(data) {
       const jasen = jasenKentat[i].value;
       if (jasen !== "") {
         uusiJoukkue.jasenet.push(jasen);
+      }
+    }
+
+    // Otetaan talteen leimaustavat
+    const leimausKentat = lomake.elements["leimaustapa"];
+    for (let i = 0; i < leimausKentat.length; i++) {
+      if (leimausKentat[i].checked) {
+        uusiJoukkue.leimaustapa.push(Number(leimausKentat[i].value));
       }
     }
 
@@ -210,11 +259,14 @@ let start = function(data) {
   
   const lomake = document.forms[0];
   const sarjat = data.sarjat;
+  const leimaustavat = data.leimaustavat;
   const submitPainike = lomake.elements["submit"];
 
-  jarjestaJaLuoSarjat(sarjat);  // Luodaan sarjojen listaus
+  jarjestaJaLuoSarjat(sarjat);
+  jarjestaJaLuoLeimaustavat(leimaustavat);
   paivitaJoukkueLista(data);
 
+  
   /**
    * Käsittelee click-tapahtuman.
    * Tarkistaa joukkueen nimen ja jäsenten kentät. Jos tarkistukset epäonnistuvat,
@@ -234,7 +286,28 @@ let start = function(data) {
       event.preventDefault();  // Estetään lähetys epäonnistuessa
       return;
     }
-    nimiKentta.setCustomValidity("");  // Tyhjennetään virheilmoitukset
+    nimiKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus
+
+
+    // Tarkistetaan, että edes yksi leimaustapa on valittu
+    const leimausKentat = lomake.elements["leimaustapa"];
+    let leimaustapaValittu = false;
+
+    for (let i = 0; i < leimausKentat.length; i++) {
+      if (leimausKentat[i].checked) {
+        leimaustapaValittu = true;
+        break;
+      }
+    }
+
+    if (!leimaustapaValittu) {
+      leimausKentat[0].setCustomValidity("Vähintään yksi leimaustapa on valittava");
+      leimausKentat[0].reportValidity();
+      event.preventDefault();  // Estetään lähetys epäonnistuessa
+      return;
+    }
+    leimausKentat[0].setCustomValidity("");  // Tyhjennetään virheilmoitus
+
 
     // Tarkistetaan jäsenkentät
     const jasenKentta = lomake.elements["jasen"];
