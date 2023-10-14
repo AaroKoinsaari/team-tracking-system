@@ -128,12 +128,17 @@ let start = function(data) {
       const li = document.createElement('li');
       li.textContent = joukkue.joukkue + " ";
 
-
       // Lisätään joukkueelle sarja
       const strong = document.createElement('strong');
       const sarja = data.sarjat.find(s => s.id === joukkue.sarja);
       strong.textContent = sarja.sarja;
       li.appendChild(strong);
+
+      // Lisätään leimaustavat
+      const leimaustavat = joukkue.leimaustapa.map(index => data.leimaustavat[index]).join(', ');
+      const leimaustavatSpan = document.createElement('span');
+      leimaustavatSpan.textContent = ` (${leimaustavat})`;
+      li.appendChild(leimaustavatSpan);
 
       // Luodaan sisäkkäinen ul-elementti jokaiselle joukkueen jäsenelle
       const sisempiUl = document.createElement('ul');
