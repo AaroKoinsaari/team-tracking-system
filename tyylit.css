@@ -10,8 +10,7 @@ form {
 
 fieldset.section {
     border: 1px solid #9e9e9e;
-    padding: 10px; /* Sisäinen marginaali */
-    margin: 15px 5px; /* Ulkoinen marginaali */
+    padding: 0, 20px;
 }
 
 legend {
@@ -27,19 +26,14 @@ legend {
     width: 100%;
 }
 
-/* Erityisasema sarjoille */
-#sarjat {
-    padding-top: 1.5rem; /* Sisäinen marginaali ylhäältä */
-}
-
 .label-container input[type="text"], 
 .label-container label {
     flex: 0 0 50%; /* Vie puolet tilasta eikä veny tai kutistu */
 }
 
-#sarjatContainer label {
+#sarjatContainer label, #leimaustavatContainer label {
     display: flex;
-    justify-content: space-between; /* Asettaa elementit eri laidoille */
+    justify-content: flex-end;
 }
 
 #sarjatContainer input[type="radio"] {
