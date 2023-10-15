@@ -109,7 +109,6 @@ let start = function(data) {
    * @param {Object} data - Tietorakenne, jossa joukkueet ovat.
    */
   function paivitaJoukkueLista(data) {
-
     const joukkueet = jarjestaJoukkueet(data.joukkueet);
 
     // Poistetaan mahdollinen vanha listaus
@@ -261,15 +260,119 @@ let start = function(data) {
     return true;
   }
 
+
+  // function tarkistaJasentenNimet(lomake, fiedNimi) {
+  //   const kentat = Array.from(lomake.elemets[fieldNimi]);
+  //   const kenttaArvot = kentat.map(kentta => kentta.value.trim());
+  //   const uniikitArvot = [...new Set(kenttaArvot)];
+  //   const taytettyjaKenttia = uniikitArvot.filter(arvo => arvo !== "").length;
+
+  //   if (taytettyjaKenttia < 2) {
+  //     return false;
+  //   }
+
+  //   return true;
+  // }
+
+
+  function tarkistaTyhjatKentat(lomake, jasenetContainer) {
+    const jasenKentat = lomake.elements['jasen'];
+    let tyhjat = 0;
+    for (let i = 0; i < jasenKentat.length; i++) {
+      if (jasenKentat[i].value === '') {
+        tyhjat++;
+      }
+    }
+    if (tyhjat === 0) {
+      paivitaJasentenNumerointi(lomake);
+    }
+    return tyhjat;
+  }
+  
+
+
+  function paivitaJasentenNumerointi(lomake) {
+    const jasenKentat = lomake.elements['jasen'];
+    
+    for (let i = 0; i < jasenKentat.length; i++) {
+      const kentta = jasenKentat[i];
+      const container = kentta.parentNode;
+      const label = container.querySelector('span');
+      label.textContent = "Jäsen " + (i + 1);
+    }
+  }
+
+
+  function lisaaJasenKentta(lomake, jasenetContainer) {
+
+    // Luodaan div container
+    const uusiKentta = document.createElement("div");
+    uusiKentta.className = "label-container";
+
+    // Lisätään uusi span-elementti labeliksi
+    const uusiLabel = document.createElement("span");
+    uusiLabel.textContent = "Jäsen";  // Numerointi päivitetään myöhemmin
+
+    // Luodaan uusi input-elementti
+    const uusiInput = document.createElement("input");
+    uusiInput.type = "text";
+    uusiInput.name = "jasen";
+    uusiInput.className = "jasen-kentta";
+    uusiInput.value = "";
+
+    // Lisätään span ja input containeriin
+    uusiKentta.appendChild(uusiLabel);
+    uusiKentta.appendChild(uusiInput);
+
+    // Lisätään uusi kenttä lomakkeeseen
+    jasenetContainer.appendChild(uusiKentta);
+
+    paivitaJasentenNumerointi(lomake);
+  }
+
+
+  function poistaJasenKentta(lomake, jasenetContainer) {
+    const jasenKentat = lomake.elements['jasen'];
+    for (let i = 0; i < jasenKentat.length; i++) {
+      if (jasenKentat[i].value === '') {
+        const parentContainer = jasenKentat[i].parentNode;
+        jasenetContainer.removeChild(parentContainer);
+        break;  // Poistetaan vain yksi tyhjä kenttä
+      }
+    }
+    paivitaJasentenNumerointi(lomake);
+  }
+  
+  
+
   
   const lomake = document.forms[0];
   const sarjat = data.sarjat;
   const leimaustavat = data.leimaustavat;
   const submitPainike = lomake.elements["submit"];
 
+  const jasenetContainer = document.getElementById('jasenetContainer');
+
   jarjestaJaLuoSarjat(sarjat);
   jarjestaJaLuoLeimaustavat(leimaustavat);
   paivitaJoukkueLista(data);
+
+
+  jasenetContainer.addEventListener('input', function(event) {
+    const target = event.target;
+    if (target.classList.contains('jasen-kentta')) {
+      const tyhjatKentat = tarkistaTyhjatKentat(lomake);
+      if (tyhjatKentat === 0) {
+        lisaaJasenKentta(lomake, jasenetContainer);
+      } else if (tyhjatKentat > 1) {
+        poistaJasenKentta(lomake, jasenetContainer);
+      }
+    }
+  });
+
+
+
+
 
   
   /**
