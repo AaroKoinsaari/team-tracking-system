@@ -177,25 +177,30 @@ let start = function(data) {
 
 
   /**
-   * Tarkistaa, että annetussa lomake-elementissä on edes yksi ei-tyhjä kenttä.
+   * Tarkistaa, onko annetussa lomakkeessa vähintään kaksi ei-tyhjää kenttä.
    *
-   * @param {HTMLFormElement} form - Lomake-elementti, jossa kentät sijaitsevat.
-   * @param {string} fieldName - Kentän nimi, jota halutaan tarkistaa.
-   * @returns {boolean} true jos vähintään yksi kenttä ei ole tyhjä, muutoin false.
+   * @param {HTMLFormElement} lomake - Lomake-elementti, jossa kentät sijaitsevat.
+   * @param {string} kentanNimi - Kentän nimi, jota halutaan tarkistaa.
+   * @returns {boolean} true jos vähintään kaksi kenttää ei ole tyhjänä, muutoin false.
    */
-  function validoiKentat(form, fieldName) {
-    const fieldElements = form.elements[fieldName];
-  
-    for (let i = 0; i < fieldElements.length; i++) {
-      const value = fieldElements[i].value.trim();
+  function validoiKentat(lomake, kentanNimi) {
+    const kentat = lomake.elements[kentanNimi];
+    let eiTyhjia = 0;  // Ei-tyhjien kenttien laskuri
+
+    for (let i = 0; i < kentat.length; i++) {
+      const value = kentat[i].value.trim();
   
       if (value !== '') {
-        return true;  // Palautetaan true, jos on edes yksi ei-tyhjä kenttä
+        eiTyhjia++;
+      }
+      
+      if (eiTyhjia >= 2) {
+        return true;
       }
     }
   
     return false;
-  }  
+  }
 
 
   /**
@@ -235,44 +240,6 @@ let start = function(data) {
 
     data.joukkueet.push(uusiJoukkue);  // Lisätään tietorakenteeseen
   }
-
-
-  /**
-   * Tarkistaa onko annettu joukkueen nimi uniikki ja vähintään 2 merkkiä pitkä.
-   *
-   * @param {Object} data - Tietorakenne, joka sisältää kaikki joukkueet.
-   * @param {string} fieldName - Tarkistettavan joukkueen nimi.
-   * @returns {boolean} - true, jos nimi on kelvollinen ja uniikki. Muutoin false.
-   */
-  function tarkistaJoukkueenNimi(data, fieldName) {
-    const nimiValue = fieldName.trim().toLowerCase();
-    if (nimiValue.length < 2) {
-      return false;
-    }
-
-    // Tarkistetaan, että nimi on uniikki
-    for (let j of data.joukkueet) {
-      if (j.joukkue.trim().toLowerCase() == nimiValue) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-
-  // function tarkistaJasentenNimet(lomake, fiedNimi) {
-  //   const kentat = Array.from(lomake.elemets[fieldNimi]);
-  //   const kenttaArvot = kentat.map(kentta => kentta.value.trim());
-  //   const uniikitArvot = [...new Set(kenttaArvot)];
-  //   const taytettyjaKenttia = uniikitArvot.filter(arvo => arvo !== "").length;
-
-  //   if (taytettyjaKenttia < 2) {
-  //     return false;
-  //   }
-
-  //   return true;
-  // }
 
 
   function tarkistaTyhjatKentat(lomake, jasenetContainer) {
@@ -343,8 +310,31 @@ let start = function(data) {
     paivitaJasentenNumerointi(lomake);
   }
 
+  /**
+   * Tarkistaa onko annettu joukkueen nimi uniikki ja vähintään 2 merkkiä pitkä.
+   *
+   * @param {Object} data - Tietorakenne, joka sisältää kaikki joukkueet.
+   * @param {string} fieldName - Tarkistettavan joukkueen nimi.
+   * @returns {boolean} - true, jos nimi on kelvollinen ja uniikki. Muutoin false.
+   */
+    function joukkueenNimiValidi(data, fieldName) {
+      const nimiValue = fieldName.trim().toLowerCase();
+      if (nimiValue.length < 2) {
+        return false;
+      }
+  
+      // Tarkistetaan, että nimi on uniikki
+      for (let j of data.joukkueet) {
+        if (j.joukkue.trim().toLowerCase() == nimiValue) {
+          return false;
+        }
+      }
+  
+      return true;
+    }
 
-  function tarkistaJasentenNimet(lomake) {
+
+  function jasentenNimetValidi(lomake) {
     const jasenKentat = Array.from(lomake.elements['jasen']); // Muunnetaan jäsenkentät taulukoksi
     const jasenNimet = jasenKentat.map(kentta => kentta.value.trim().toLowerCase());
 
@@ -359,6 +349,69 @@ let start = function(data) {
       nimetSet.add(nimi);
     }
     return true;  // Ei samannimisiä
+  }
+
+
+  function tarkistaJoukkueenNimi(lomake, data) {
+    let onkoOikein = true;
+
+    const nimiKentta = lomake.elements["nimi"];
+    const nimiValidi = joukkueenNimiValidi(data, nimiKentta.value);
+    if (!nimiValidi) {
+      nimiKentta.setCustomValidity("Joukkueen nimen on uniikki ja vähintään kaksi merkkiä pitkä");
+      nimiKentta.reportValidity();
+      onkoOikein = false;
+    }
+    nimiKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus
+    return onkoOikein;
+  }
+
+
+  function tarkistaLeimaustapa(lomake) {
+    let leimaustapaValittu = false;
+    const leimausKentat = lomake.elements["leimaustapa"];
+
+    for (let i = 0; i < leimausKentat.length; i++) {
+      if (leimausKentat[i].checked) {
+        leimaustapaValittu = true;
+        break;
+      }
+    }
+
+    if (!leimaustapaValittu) {
+      leimausKentat[0].setCustomValidity("Vähintään yksi leimaustapa on valittava");
+      leimausKentat[0].reportValidity();
+      // leimaustapaValittu = false;
+    }
+
+    leimausKentat[0].setCustomValidity("");  // Tyhjennetään virheilmoitus
+    return leimaustapaValittu;
+  }
+
+
+  function tarkistaJasenet(lomake) {
+    let onkoOikein = true;
+
+    // Tarkistetaan jäsenkentät
+    const jasenKentta = lomake.elements["jasen"];
+    const ekaKentta = jasenKentta[0];
+    const jasenetValidit = validoiKentat(lomake, "jasen");
+    if (!jasenetValidit) {
+      // Asetetaan virheilmoitus vain ensimmäiseen kenttään
+      ekaKentta.setCustomValidity("Joukkueella on oltava vähintään yksi jäsen");
+      ekaKentta.reportValidity();
+      onkoOikein = false;
+    }
+    ekaKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus
+
+    // Tarkistetaan vielä, ettei jäsenkentissä ole samannimisiä
+    if (!jasentenNimetValidi(lomake)) {
+      ekaKentta.setCustomValidity("Jäsenet eivät voi olla samannimisiä");
+      ekaKentta.reportValidity();
+      onkoOikein = false;
+    }
+    ekaKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus lopuksi
+    return onkoOikein;
   }
   
 
@@ -397,57 +450,11 @@ let start = function(data) {
   submitPainike.addEventListener('click',  function(event) {
     console.log("Click-tapahtumankäsittelijä aktivoitu"); 
 
-    // Tarkistetaan joukkueen nimi
-    const nimiKentta = lomake.elements["nimi"];
-    const joukkueenNimiValidi = tarkistaJoukkueenNimi(data, nimiKentta.value);
-    if (!joukkueenNimiValidi) {
-      nimiKentta.setCustomValidity("Joukkueen nimen on uniikki ja vähintään kaksi merkkiä pitkä");
-      nimiKentta.reportValidity();
+    if (!tarkistaJoukkueenNimi(lomake, data) ||
+        !tarkistaLeimaustapa(lomake) ||
+        !tarkistaJasenet(lomake)) {
       event.preventDefault();  // Estetään lähetys epäonnistuessa
-      return;
     }
-    nimiKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus
-
-
-    // Tarkistetaan, että edes yksi leimaustapa on valittu
-    const leimausKentat = lomake.elements["leimaustapa"];
-    let leimaustapaValittu = false;
-
-    for (let i = 0; i < leimausKentat.length; i++) {
-      if (leimausKentat[i].checked) {
-        leimaustapaValittu = true;
-        break;
-      }
-    }
-
-    if (!leimaustapaValittu) {
-      leimausKentat[0].setCustomValidity("Vähintään yksi leimaustapa on valittava");
-      leimausKentat[0].reportValidity();
-      event.preventDefault();  // Estetään lähetys epäonnistuessa
-      return;
-    }
-    leimausKentat[0].setCustomValidity("");  // Tyhjennetään virheilmoitus
-
-    // Tarkistetaan jäsenkentät
-    const jasenKentta = lomake.elements["jasen"];
-    const ekaKentta = jasenKentta[0];
-    const jasenetValidit = validoiKentat(lomake, "jasen");
-    if (!jasenetValidit) {
-      // Asetetaan virheilmoitus vain ensimmäiseen kenttään
-      ekaKentta.setCustomValidity("Joukkueella on oltava vähintään yksi jäsen");
-      ekaKentta.reportValidity();
-      event.preventDefault();  // Estetään lähetys epäonnistuessa
-      return;
-    }
-    ekaKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus lopuksi
-
-    // Tarkistetaan vielä, ettei jäsenkentissä ole samannimisiä
-    if (!tarkistaJasentenNimet(lomake)) {
-      ekaKentta.setCustomValidity("Jäsenet eivät voi olla samannimisiä");
-      ekaKentta.reportValidity();
-      return;
-    }
-    ekaKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus lopuksi
   });
 
 
