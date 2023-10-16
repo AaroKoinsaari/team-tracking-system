@@ -47,16 +47,18 @@
           </fieldset>
           <fieldset class="section">
             <legend>Jäsenet</legend>
-            <div class="label-container">
-              <span>Jäsen 1</span>
-              <input type="text" name="jasen" value="" />
+            <div id="jasenetContainer">
+              <div class="label-container">
+                <span>Jäsen 1</span>
+                <input type="text" name="jasen" class="jasen-kentta" value="" />
+              </div>
+              <div class="label-container">
+                <span>Jäsen 2</span>
+                <input type="text" name="jasen" class="jasen-kentta" value="" />
+              </div>
             </div>
-            <div class="label-container">
-              <span>Jäsen 2</span>
-              <input type="text" name="jasen" value="" />
-            </div>
-          </fieldset>
-          <input type="submit" name="submit" value="Lisää uusi" />
+          </fieldset>          
+          <input type="submit" name="submit" value="Tallenna" />
         </form>
         <ul id="joukkueLista">
           <!-- Tähän tulee joukkuelistaus -->
