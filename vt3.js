@@ -342,10 +342,26 @@ let start = function(data) {
     }
     paivitaJasentenNumerointi(lomake);
   }
-  
+
+
+  function tarkistaJasentenNimet(lomake) {
+    const jasenKentat = Array.from(lomake.elements['jasen']); // Muunnetaan jäsenkentät taulukoksi
+    const jasenNimet = jasenKentat.map(kentta => kentta.value.trim().toLowerCase());
+
+    const nimetSet = new Set();  // Luodaan set, joka varastoi uniikit nimet
+    for (let nimi of jasenNimet) {
+      if (nimi === '') {
+        continue;
+      }
+      if (nimetSet.has(nimi)) {
+        return false;  // Samanniminen löytyi
+      }
+      nimetSet.add(nimi);
+    }
+    return true;  // Ei samannimisiä
+  }
   
 
-  
   const lomake = document.forms[0];
   const sarjat = data.sarjat;
   const leimaustavat = data.leimaustavat;
@@ -371,10 +387,6 @@ let start = function(data) {
   });
 
 
-
-
-
-  
   /**
    * Käsittelee click-tapahtuman.
    * Tarkistaa joukkueen nimen ja jäsenten kentät. Jos tarkistukset epäonnistuvat,
@@ -416,21 +428,26 @@ let start = function(data) {
     }
     leimausKentat[0].setCustomValidity("");  // Tyhjennetään virheilmoitus
 
-
     // Tarkistetaan jäsenkentät
     const jasenKentta = lomake.elements["jasen"];
+    const ekaKentta = jasenKentta[0];
     const jasenetValidit = validoiKentat(lomake, "jasen");
     if (!jasenetValidit) {
-      for (let kentta of jasenKentta) {
-        kentta.setCustomValidity("Joukkueella on oltava vähintään yksi jäsen");
-      }
-      jasenKentta[0].reportValidity();  // Toinen kentistä riittää virheilmoitukseen
+      // Asetetaan virheilmoitus vain ensimmäiseen kenttään
+      ekaKentta.setCustomValidity("Joukkueella on oltava vähintään yksi jäsen");
+      ekaKentta.reportValidity();
       event.preventDefault();  // Estetään lähetys epäonnistuessa
       return;
     }
-    for (let kentta of jasenKentta) {
-      kentta.setCustomValidity("");  // Tyhjennetään virheilmoitukset
+    ekaKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus lopuksi
+
+    // Tarkistetaan vielä, ettei jäsenkentissä ole samannimisiä
+    if (!tarkistaJasentenNimet(lomake)) {
+      ekaKentta.setCustomValidity("Jäsenet eivät voi olla samannimisiä");
+      ekaKentta.reportValidity();
+      return;
     }
+    ekaKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus lopuksi
   });
 
 
