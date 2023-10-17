@@ -103,6 +103,33 @@ let start = function(data) {
   }
 
 
+  function taytaLomake(joukkue) {
+
+    // Täytetään perustiedot
+    lomake['nimi'].value = joukkue.joukkue;
+    lomake['sarja'].value = joukkue.sarja;
+
+    // Selvitetään, tarvitaanko lisää jäsenkenttiä ja lisätään ne tarvittaessa
+    const jasenKentat = lomake.elements['jasen'];
+    while (jasenKentat.length < joukkue.jasenet.length) {
+      lisaaJasenKentta(lomake, jasenetContainer);
+    }
+
+    // Täytetään jäsenet
+    for (let i = 0; i < jasenKentat.length && i < joukkue.jasenet.length; i++) {
+      jasenKentat[i].value = joukkue.jasenet[i];
+    }
+
+    // Täytetään leimaustavat
+    const leimaustapaKentat = lomake.elements['leimaustapa'];
+    for (const leimaus of leimaustapaKentat) {
+      if (joukkue.leimaustapa.includes(Number(leimaus.value))) {
+        leimaus.checked = true;
+      }
+    }
+  }
+
+
   /**
    * Päivittää joukkueiden listan sivulla korvaamalla mahdollisen vanhan listauksen uudella
    *
@@ -131,6 +158,14 @@ let start = function(data) {
       const joukkueLink = document.createElement('a');
       joukkueLink.textContent = joukkue.joukkue;
       joukkueLink.href = "#" + joukkue.joukkue;
+
+      // Lisätään tapahtumankuuntelija linkin klikkaukselle
+      joukkueLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        lomake.scrollIntoView();  // Vieritetään sivua lomakkeen kohdalle
+        taytaLomake(joukkue);
+      });
+
       li.appendChild(joukkueLink);
       li.append(" ");  // Välilyönti nimen ja sarjan väliin
 
