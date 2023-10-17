@@ -216,7 +216,7 @@ let start = function(data) {
     data.joukkueet.push(uusiJoukkue);  // Lisätään tietorakenteeseen
   }
 
-  
+
   /**
    * Tarkistaa annetut kentät ja laskee, kuinka monta niistä on tyhjiä.
    * Tyhjyys määritellään siten, että kentän arvo on joko tyhjä merkkijono tai sisältää vain välilyöntejä.
@@ -495,6 +495,11 @@ let start = function(data) {
 
     luoJaLisaaJoukkue(data, lomake);
     lomake.reset();
+
+    // Poistetaan mahdolliset ylimääräiset jäsenkentät samalla
+    while (lomake.elements['jasen'].length > 2) {
+      poistaJasenKentta(lomake, jasenetContainer);
+    }
 
     localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
 
