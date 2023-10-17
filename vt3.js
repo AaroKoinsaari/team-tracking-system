@@ -365,6 +365,7 @@ let start = function(data) {
   function tarkistaJoukkueenNimi(lomake, data) {
     const nimiKentta = lomake.elements["nimi"];
     const nimiValidi = joukkueenNimiValidi(data, nimiKentta.value);
+
     if (!nimiValidi) {
       nimiKentta.setCustomValidity("Joukkueen nimen on uniikki ja vähintään kaksi merkkiä pitkä");
       nimiKentta.reportValidity();
@@ -375,25 +376,29 @@ let start = function(data) {
   }
 
 
+  /**
+   * Tarkistaa, että vähintään yksi leimaustapa on valittu lomakkeessa.
+   * 
+   * Jos yhtään leimaustapaa ei ole valittu, asettaa virheilmoituksen ensimmäiseen leimaustapa-kenttään.
+   * Jos vähintään yksi leimaustapa on valittu, nollaa mahdollisen aikaisemman virheilmoituksen.
+   *
+   * @param {HTMLFormElement} lomake - Lomake-elementti, jossa leimaustavat sijaitsevat.
+   * @returns {boolean} - true, jos vähintään yksi leimaustapa on valittu, muuten false.
+   */
   function tarkistaLeimaustapa(lomake) {
-    let leimaustapaValittu = false;
     const leimausKentat = lomake.elements["leimaustapa"];
+    const ekaKentta = leimausKentat[0];
 
     for (let i = 0; i < leimausKentat.length; i++) {
       if (leimausKentat[i].checked) {
-        leimaustapaValittu = true;
-        break;
+        ekaKentta.setCustomValidity("");  // Tyhjennetään mahdollinen aikaisempi virheilmoitus
+        return true;
       }
     }
 
-    if (!leimaustapaValittu) {
-      leimausKentat[0].setCustomValidity("Vähintään yksi leimaustapa on valittava");
-      leimausKentat[0].reportValidity();
-      // leimaustapaValittu = false;
-    }
-
-    leimausKentat[0].setCustomValidity("");  // Tyhjennetään virheilmoitus
-    return leimaustapaValittu;
+    leimausKentat[0].setCustomValidity("Vähintään yksi leimaustapa on valittava");
+    leimausKentat[0].reportValidity();
+    return false;
   }
 
 
