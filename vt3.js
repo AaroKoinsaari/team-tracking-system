@@ -310,29 +310,6 @@ let start = function(data) {
     paivitaJasentenNumerointi(lomake);
   }
 
-  /**
-   * Tarkistaa onko annettu joukkueen nimi uniikki ja vähintään 2 merkkiä pitkä.
-   *
-   * @param {Object} data - Tietorakenne, joka sisältää kaikki joukkueet.
-   * @param {string} fieldName - Tarkistettavan joukkueen nimi.
-   * @returns {boolean} - true, jos nimi on kelvollinen ja uniikki. Muutoin false.
-   */
-    function joukkueenNimiValidi(data, fieldName) {
-      const nimiValue = fieldName.trim().toLowerCase();
-      if (nimiValue.length < 2) {
-        return false;
-      }
-  
-      // Tarkistetaan, että nimi on uniikki
-      for (let j of data.joukkueet) {
-        if (j.joukkue.trim().toLowerCase() == nimiValue) {
-          return false;
-        }
-      }
-  
-      return true;
-    }
-
 
   function jasentenNimetValidi(lomake) {
     const jasenKentat = Array.from(lomake.elements['jasen']); // Muunnetaan jäsenkentät taulukoksi
@@ -352,28 +329,38 @@ let start = function(data) {
   }
 
 
-  /**
-   * Tarkistaa joukkueen nimen validiteetin.
-   * 
-   * Jos joukkueen nimi ei ole validi, asettaa virheilmoituksen nimen kenttään.
-   * Jos nimi on validi, nollaa mahdollisen aikaisemman virheilmoituksen.
-   *
-   * @param {HTMLFormElement} lomake - Lomake-elementti, jossa joukkueen nimen kenttä on.
-   * @param {Object} data - Data, josta joukkueiden nimiä verrataan.
-   * @returns {boolean} - true, jos nimi on validi, muuten false.
-   */
-  function tarkistaJoukkueenNimi(lomake, data) {
-    const nimiKentta = lomake.elements["nimi"];
-    const nimiValidi = joukkueenNimiValidi(data, nimiKentta.value);
+/**
+ * Tarkistaa, että joukkueen nimi on uniikki ja vähintään kaksi merkkiä pitkä.
+ * Asettaa tarvittavat virheilmoitukset.
+ * 
+ * @param {HTMLFormElement} lomake - Lomake-elementti, jossa nimi-kenttä sijaitsee.
+ * @param {Object} data - Data, josta tarkistetaan muiden joukkueiden nimet.
+ * @returns {boolean} true, jos nimi on kelvollinen; false, jos ei.
+ */
+function tarkistaJoukkueenNimi(lomake, data) {
+  const nimiKentta = lomake.elements["nimi"];
+  const nimiValue = nimiKentta.value.trim().toLowerCase();
+  
+  // Tarkistetaan nimen pituus
+  if (nimiValue.length < 2) {
+    nimiKentta.setCustomValidity("Joukkueen nimen on oltava vähintään kaksi merkkiä pitkä");
+    nimiKentta.reportValidity();
+    return false;
+  }
 
-    if (!nimiValidi) {
-      nimiKentta.setCustomValidity("Joukkueen nimen on uniikki ja vähintään kaksi merkkiä pitkä");
+  // Tarkistetaan, että nimi on uniikki
+  for (let j of data.joukkueet) {
+    if (j.joukkue.trim().toLowerCase() === nimiValue) {
+      nimiKentta.setCustomValidity("Joukkueen nimen on oltava uniikki");
       nimiKentta.reportValidity();
       return false;
     }
-    nimiKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus
-    return true;
   }
+
+  // Tyhjennetään mahdollinen aikaisempi virheilmoitus
+  nimiKentta.setCustomValidity("");
+  return true;
+}
 
 
   /**
