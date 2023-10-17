@@ -157,22 +157,24 @@ let start = function(data) {
 
   /**
    * Järjestää joukkueet aakkosjärjestykseen nimen perusteella
+   * jättäen huomiotta mahdolliset whitespacet nimen alusta ja lopusta.
    * 
    * @param {Object} joukkueet 
-   * @returns Lista joukkueista aakkosjärjestyksessä
+   * @returns {Array} Aakkosjärjestykseen järjestetty joukkueiden taulukko.
    */
   function jarjestaJoukkueet(joukkueet) {
-    return joukkueet.sort((a, b) => a.joukkue.localeCompare(b.joukkue));
+    return joukkueet.sort((a, b) => a.joukkue.trim().localeCompare(b.joukkue.trim()));
   }
 
 
   /**
    * Järjestää joukkueiden jäsenet aakkosjärjestykseen
+   * jättäen huomiotta mahdolliset whitespacet nimen alusta ja lopusta.
    * 
    * @param {Object} joukkue Joukkueobjekti
    */
   function jarjestaJasenet(joukkue) {
-    joukkue.jasenet.sort((a, b) => a.localeCompare(b));
+    joukkue.jasenet.sort((a, b) => a.trim().localeCompare(b.trim()));
   }
 
 
