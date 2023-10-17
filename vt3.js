@@ -178,31 +178,22 @@ let start = function(data) {
   }
 
 
-  /**
-   * Tarkistaa, onko annetussa lomakkeessa vähintään kaksi ei-tyhjää kenttä.
-   *
-   * @param {HTMLFormElement} lomake - Lomake-elementti, jossa kentät sijaitsevat.
-   * @param {string} kentanNimi - Kentän nimi, jota halutaan tarkistaa.
-   * @returns {boolean} true jos vähintään kaksi kenttää ei ole tyhjänä, muutoin false.
-   */
-  function validoiKentat(lomake, kentanNimi) {
-    const kentat = lomake.elements[kentanNimi];
-    let eiTyhjia = 0;  // Ei-tyhjien kenttien laskuri
-
-    for (let i = 0; i < kentat.length; i++) {
-      const value = kentat[i].value.trim();
-  
-      if (value !== '') {
-        eiTyhjia++;
-      }
-      
-      if (eiTyhjia >= 2) {
-        return true;
-      }
-    }
-  
-    return false;
-  }
+  // /**
+  //  * Tarkistaa, kuinka monta tyhjää kenttää on annetussa taulukossa.
+  //  *
+  //  * @param {Array} kentat - Taulukko kentistä, jotka halutaan tarkistaa.
+  //  * @returns {number} Tyhjien kenttien lukumäärä.
+  //  */
+  // function kuinkaMontaTyhjaa(kentat) {
+  //   let tyhjia = 0;
+  //   for (let i = 0; i < kentat.length; i++) {
+  //     const value = kentat[i].value.trim();
+  //     if (value === '') {
+  //       tyhjia++;
+  //     }
+  //   }
+  //   return tyhjia;
+  // }
 
 
   /**
@@ -244,21 +235,18 @@ let start = function(data) {
   }
 
 
-  function tarkistaTyhjatKentat(lomake, jasenetContainer) {
-    const jasenKentat = lomake.elements['jasen'];
-    let tyhjat = 0;
-    for (let i = 0; i < jasenKentat.length; i++) {
-      if (jasenKentat[i].value === '') {
-        tyhjat++;
+
+  function tarkistaTyhjatKentat(kentat) {
+    let tyhjia = 0;
+    for (let i = 0; i < kentat.length; i++) {
+      const value = kentat[i].value.trim();
+      if (value === '') {
+        tyhjia++;
       }
     }
-    if (tyhjat === 0) {
-      paivitaJasentenNumerointi(lomake);
-    }
-    return tyhjat;
+    return tyhjia;
   }
   
-
 
   function paivitaJasentenNumerointi(lomake) {
     const jasenKentat = lomake.elements['jasen'];
@@ -313,56 +301,62 @@ let start = function(data) {
   }
 
 
-  function jasentenNimetValidi(lomake) {
-    const jasenKentat = Array.from(lomake.elements['jasen']); // Muunnetaan jäsenkentät taulukoksi
-    const jasenNimet = jasenKentat.map(kentta => kentta.value.trim().toLowerCase());
-
-    const nimetSet = new Set();  // Luodaan set, joka varastoi uniikit nimet
-    for (let nimi of jasenNimet) {
-      if (nimi === '') {
+  /**
+   * Tarkistaa, ovatko taulukon nimet uniikkeja (case-insensitive ja whitespace trimmattu).
+   *
+   * @param {string[]} nimet - Taulukko nimistä, jotka halutaan tarkistaa.
+   * @returns {boolean} - true, jos kaikki nimet ovat uniikkeja; muuten false.
+   */
+  function ovatkoNimetUniikkeja(nimet) {
+    const nimetSet = new Set();  // Luodaan Set uniikkien nimien tallennukseen
+  
+    for (let nimi of nimet) {
+      const vertailtavaNimi = nimi.trim().toLowerCase();
+      if (vertailtavaNimi === '') {
         continue;
       }
-      if (nimetSet.has(nimi)) {
-        return false;  // Samanniminen löytyi
+      if (nimetSet.has(vertailtavaNimi)) {
+        return false;  // Samanlainen nimi löytyi
       }
-      nimetSet.add(nimi);
+      nimetSet.add(vertailtavaNimi);
     }
-    return true;  // Ei samannimisiä
-  }
-
-
-/**
- * Tarkistaa, että joukkueen nimi on uniikki ja vähintään kaksi merkkiä pitkä.
- * Asettaa tarvittavat virheilmoitukset.
- * 
- * @param {HTMLFormElement} lomake - Lomake-elementti, jossa nimi-kenttä sijaitsee.
- * @param {Object} data - Data, josta tarkistetaan muiden joukkueiden nimet.
- * @returns {boolean} true, jos nimi on kelvollinen; false, jos ei.
- */
-function tarkistaJoukkueenNimi(lomake, data) {
-  const nimiKentta = lomake.elements["nimi"];
-  const nimiValue = nimiKentta.value.trim().toLowerCase();
   
-  // Tarkistetaan nimen pituus
-  if (nimiValue.length < 2) {
-    nimiKentta.setCustomValidity("Joukkueen nimen on oltava vähintään kaksi merkkiä pitkä");
-    nimiKentta.reportValidity();
-    return false;
-  }
+    return true;  // Kaikki nimet ovat uniikkeja
+  } 
 
-  // Tarkistetaan, että nimi on uniikki
-  for (let j of data.joukkueet) {
-    if (j.joukkue.trim().toLowerCase() === nimiValue) {
+
+  /**
+   * Tarkistaa, että joukkueen nimi on uniikki ja vähintään kaksi merkkiä pitkä.
+   * Asettaa tarvittavat virheilmoitukset.
+   * 
+   * @param {HTMLFormElement} lomake - Lomake-elementti, jossa nimi-kenttä sijaitsee.
+   * @param {Object} data - Data, josta tarkistetaan muiden joukkueiden nimet.
+   * @returns {boolean} true, jos nimi on kelvollinen; false, jos ei.
+   */
+  function tarkistaJoukkueenNimi(lomake, data) {
+    const nimiKentta = lomake.elements["nimi"];
+    const nimiValue = nimiKentta.value.trim().toLowerCase();
+    
+    // Tarkistetaan nimen pituus
+    if (nimiValue.length < 2) {
+      nimiKentta.setCustomValidity("Joukkueen nimen on oltava vähintään kaksi merkkiä pitkä");
+      nimiKentta.reportValidity();
+      return false;
+    }
+
+    // Tarkistetaan, että nimi on uniikki koko datassa
+    const joukkueidenNimet = data.joukkueet.map(joukkue => joukkue.joukkue);
+    joukkueidenNimet.push(nimiValue);
+    if (!ovatkoNimetUniikkeja(joukkueidenNimet)) {
       nimiKentta.setCustomValidity("Joukkueen nimen on oltava uniikki");
       nimiKentta.reportValidity();
       return false;
     }
-  }
 
-  // Tyhjennetään mahdollinen aikaisempi virheilmoitus
-  nimiKentta.setCustomValidity("");
-  return true;
-}
+    // Tyhjennetään mahdollinen aikaisempi virheilmoitus
+    nimiKentta.setCustomValidity("");
+    return true;
+  }
 
 
   /**
@@ -390,30 +384,37 @@ function tarkistaJoukkueenNimi(lomake, data) {
     return false;
   }
 
-
+  /**
+   * Tarkistaa lomakkeen jäsenkentät seuraavilla säännöillä:
+   * 1. Joukkueella on oltava vähintään kaksi jäsentä.
+   * 2. Jäsenet eivät voi olla samannimisiä.
+   *
+   * @param {HTMLFormElement} lomake - Lomake-elementti, joka sisältää jäsenkentät.
+   * @returns {boolean} - true, jos tarkistukset onnistuvat, muuten false
+   */
   function tarkistaJasenet(lomake) {
-    let onkoOikein = true;
-
     // Tarkistetaan jäsenkentät
-    const jasenKentta = lomake.elements["jasen"];
-    const ekaKentta = jasenKentta[0];
-    const jasenetValidit = validoiKentat(lomake, "jasen");
-    if (!jasenetValidit) {
-      // Asetetaan virheilmoitus vain ensimmäiseen kenttään
-      ekaKentta.setCustomValidity("Joukkueella on oltava vähintään yksi jäsen");
-      ekaKentta.reportValidity();
-      onkoOikein = false;
-    }
-    ekaKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus
+    const jasenKentat = lomake.elements["jasen"];
+    const ekaKentta = jasenKentat[0];  // TODO: Virheilmoitukset oikeaan kenttään
 
-    // Tarkistetaan vielä, ettei jäsenkentissä ole samannimisiä
-    if (!jasentenNimetValidi(lomake)) {
+    // Tarkistetaan, että jäsenkenttiä on tyhjänä enintään yksi
+    const tyhjatKentat = tarkistaTyhjatKentat(jasenKentat);
+    if (tyhjatKentat >= jasenKentat.length) {
+      ekaKentta.setCustomValidity("Joukkueella on oltava vähintään kaksi jäsentä");
+      ekaKentta.reportValidity();
+      return false;
+    }
+    ekaKentta.setCustomValidity("");  // Tyhjennetään mahdollinen aiempi virheilmoitus
+
+    // Tarkistetaan, ettei jäsenkentissä ole samannimisiä
+    const jasenKentatArray = Array.from(jasenKentat).map(el => el.value);  // Luodaan taulukko nimistä
+    if (!ovatkoNimetUniikkeja(jasenKentatArray)) {
       ekaKentta.setCustomValidity("Jäsenet eivät voi olla samannimisiä");
       ekaKentta.reportValidity();
-      onkoOikein = false;
+      return false;
     }
-    ekaKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus lopuksi
-    return onkoOikein;
+    ekaKentta.setCustomValidity("");  // Tyhjennetään mahdollinen aiempi virheilmoitus
+    return true;
   }
   
 
@@ -432,14 +433,18 @@ function tarkistaJoukkueenNimi(lomake, data) {
   jasenetContainer.addEventListener('input', function(event) {
     const target = event.target;
     if (target.classList.contains('jasen-kentta')) {
-      const tyhjatKentat = tarkistaTyhjatKentat(lomake);
+      const jasenKentat = lomake.elements["jasen"];
+      const tyhjatKentat = tarkistaTyhjatKentat(jasenKentat);
+  
       if (tyhjatKentat === 0) {
         lisaaJasenKentta(lomake, jasenetContainer);
-      } else if (tyhjatKentat > 1) {
+      }
+      else if (tyhjatKentat > 1) {
         poistaJasenKentta(lomake, jasenetContainer);
       }
     }
   });
+  
 
 
   /**
