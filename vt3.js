@@ -399,7 +399,7 @@ let start = function(data) {
 
     // Tarkistetaan, että jäsenkenttiä on tyhjänä enintään yksi
     const tyhjatKentat = tarkistaTyhjatKentat(jasenKentat);
-    if (tyhjatKentat >= jasenKentat.length) {
+    if (tyhjatKentat >= jasenKentat.length - 1) {
       ekaKentta.setCustomValidity("Joukkueella on oltava vähintään kaksi jäsentä");
       ekaKentta.reportValidity();
       return false;
@@ -430,6 +430,7 @@ let start = function(data) {
   paivitaJoukkueLista(data);
 
 
+  // TODO: Jäsen 2 jää jos kaikki tyhjentää
   jasenetContainer.addEventListener('input', function(event) {
     const target = event.target;
     if (target.classList.contains('jasen-kentta')) {
