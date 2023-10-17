@@ -352,18 +352,26 @@ let start = function(data) {
   }
 
 
+  /**
+   * Tarkistaa joukkueen nimen validiteetin.
+   * 
+   * Jos joukkueen nimi ei ole validi, asettaa virheilmoituksen nimen kenttään.
+   * Jos nimi on validi, nollaa mahdollisen aikaisemman virheilmoituksen.
+   *
+   * @param {HTMLFormElement} lomake - Lomake-elementti, jossa joukkueen nimen kenttä on.
+   * @param {Object} data - Data, josta joukkueiden nimiä verrataan.
+   * @returns {boolean} - true, jos nimi on validi, muuten false.
+   */
   function tarkistaJoukkueenNimi(lomake, data) {
-    let onkoOikein = true;
-
     const nimiKentta = lomake.elements["nimi"];
     const nimiValidi = joukkueenNimiValidi(data, nimiKentta.value);
     if (!nimiValidi) {
       nimiKentta.setCustomValidity("Joukkueen nimen on uniikki ja vähintään kaksi merkkiä pitkä");
       nimiKentta.reportValidity();
-      onkoOikein = false;
+      return false;
     }
     nimiKentta.setCustomValidity("");  // Tyhjennetään virheilmoitus
-    return onkoOikein;
+    return true;
   }
 
 
