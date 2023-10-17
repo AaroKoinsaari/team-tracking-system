@@ -125,7 +125,14 @@ let start = function(data) {
     for (const joukkue of joukkueet) {
       jarjestaJasenet(joukkue);
       const li = document.createElement('li');
-      li.textContent = joukkue.joukkue + " ";
+      // li.textContent = joukkue.joukkue + " ";
+
+      // Luodaan linkki joukkueelle
+      const joukkueLink = document.createElement('a');
+      joukkueLink.textContent = joukkue.joukkue;
+      joukkueLink.href = "#" + joukkue.joukkue;
+      li.appendChild(joukkueLink);
+      li.append(" ");  // Välilyönti nimen ja sarjan väliin
 
       // Lisätään joukkueelle sarja
       const strong = document.createElement('strong');
