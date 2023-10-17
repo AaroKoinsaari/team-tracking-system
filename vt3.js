@@ -103,19 +103,26 @@ let start = function(data) {
   }
 
 
-  function taytaLomake(joukkue) {
+  function taytaLomake(lomake, joukkue) {
+    lomake.reset();  // Tyhjennetään aluksi entiset lomaketiedot
+    let jasenKentat = lomake.elements['jasen'];
+
+    // Poistetaan ylimääräiset jäsenkentät
+    while (jasenKentat.length > 2) {
+      poistaJasenKentta(lomake, jasenetContainer);
+      jasenKentat = lomake.elements['jasen'];  // Päivitetään jäsenkentät
+    }
+
+    while (jasenKentat.length <= joukkue.jasenet.length) {
+      lisaaJasenKentta(lomake, jasenetContainer);
+      jasenKentat = lomake.elements['jasen'];  // Päivitetään jäsenkentät
+    }
 
     // Täytetään perustiedot
     lomake['nimi'].value = joukkue.joukkue;
     lomake['sarja'].value = joukkue.sarja;
 
-    // Selvitetään, tarvitaanko lisää jäsenkenttiä ja lisätään ne tarvittaessa
-    const jasenKentat = lomake.elements['jasen'];
-    while (jasenKentat.length < joukkue.jasenet.length) {
-      lisaaJasenKentta(lomake, jasenetContainer);
-    }
-
-    // Täytetään jäsenet
+    // Täytetään jäsenekentät
     for (let i = 0; i < jasenKentat.length && i < joukkue.jasenet.length; i++) {
       jasenKentat[i].value = joukkue.jasenet[i];
     }
@@ -163,7 +170,7 @@ let start = function(data) {
       joukkueLink.addEventListener('click', function(event) {
         event.preventDefault();
         lomake.scrollIntoView();  // Vieritetään sivua lomakkeen kohdalle
-        taytaLomake(joukkue);
+        taytaLomake(lomake, joukkue);
       });
 
       li.appendChild(joukkueLink);
@@ -473,6 +480,8 @@ let start = function(data) {
   const submitPainike = lomake.elements["submit"];
 
   const jasenetContainer = document.getElementById('jasenetContainer');
+
+  lomake.reset();  // Tyhjennetään lomake aina sivun päivittyessä
 
   jarjestaJaLuoSarjat(sarjat);
   jarjestaJaLuoLeimaustavat(leimaustavat);
