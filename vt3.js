@@ -178,24 +178,6 @@ let start = function(data) {
   }
 
 
-  // /**
-  //  * Tarkistaa, kuinka monta tyhjää kenttää on annetussa taulukossa.
-  //  *
-  //  * @param {Array} kentat - Taulukko kentistä, jotka halutaan tarkistaa.
-  //  * @returns {number} Tyhjien kenttien lukumäärä.
-  //  */
-  // function kuinkaMontaTyhjaa(kentat) {
-  //   let tyhjia = 0;
-  //   for (let i = 0; i < kentat.length; i++) {
-  //     const value = kentat[i].value.trim();
-  //     if (value === '') {
-  //       tyhjia++;
-  //     }
-  //   }
-  //   return tyhjia;
-  // }
-
-
   /**
    * Luo uuden joukkue-objektin ja lisää sen annettuun tietorakenteeseen.
    *
@@ -234,8 +216,14 @@ let start = function(data) {
     data.joukkueet.push(uusiJoukkue);  // Lisätään tietorakenteeseen
   }
 
-
-
+  
+  /**
+   * Tarkistaa annetut kentät ja laskee, kuinka monta niistä on tyhjiä.
+   * Tyhjyys määritellään siten, että kentän arvo on joko tyhjä merkkijono tai sisältää vain välilyöntejä.
+   *
+   * @param {HTMLCollection} kentat -  HTML tekstikentät.
+   * @returns {number} tyhjia - Tyhjien kenttien lukumäärä.
+   */
   function tarkistaTyhjatKentat(kentat) {
     let tyhjia = 0;
     for (let i = 0; i < kentat.length; i++) {
@@ -248,6 +236,11 @@ let start = function(data) {
   }
   
 
+  /**
+   * Päivittää jäsenkenttien numeroinnin HTML-lomakkeessa.
+   * 
+   * @param {HTMLFormElement} lomake - Lomake-elementti, jossa jäsenkentät ovat.
+   */
   function paivitaJasentenNumerointi(lomake) {
     const jasenKentat = lomake.elements['jasen'];
     
@@ -255,11 +248,19 @@ let start = function(data) {
       const kentta = jasenKentat[i];
       const container = kentta.parentNode;
       const label = container.querySelector('span');
+      
       label.textContent = "Jäsen " + (i + 1);
+      
     }
   }
+  
 
-
+  /**
+   * Lisää uuden jäsenkentän lomakkeeseen.
+   *
+   * @param {HTMLFormElement} lomake - Lomake-elementti, johon uusi jäsenkenttä lisätään.
+   * @param {HTMLElement} jasenetContainer - div-elementti, joka sisältää kaikki jäsenkentät.
+   */
   function lisaaJasenKentta(lomake, jasenetContainer) {
 
     // Luodaan div container
@@ -288,6 +289,12 @@ let start = function(data) {
   }
 
 
+  /**
+   * Poistaa ensimmäisen tyhjän jäsenkentän lomakkeesta.
+   *
+   * @param {HTMLFormElement} lomake - Lomake-elementti, josta jäsenkenttä poistetaan.
+   * @param {HTMLElement} jasenetContainer - div-elementti, joka sisältää kaikki jäsenkentät.
+   */
   function poistaJasenKentta(lomake, jasenetContainer) {
     const jasenKentat = lomake.elements['jasen'];
     for (let i = 0; i < jasenKentat.length; i++) {
@@ -430,7 +437,12 @@ let start = function(data) {
   paivitaJoukkueLista(data);
 
 
-  // TODO: Jäsen 2 jää jos kaikki tyhjentää
+  /**
+   * Käsittelee input-tapahtumat jäsenkentissä.
+   *
+   * @listens input
+   * @param {Event} event - input-tapahtuman tiedot.
+   */
   jasenetContainer.addEventListener('input', function(event) {
     const target = event.target;
     if (target.classList.contains('jasen-kentta')) {
@@ -440,12 +452,14 @@ let start = function(data) {
       if (tyhjatKentat === 0) {
         lisaaJasenKentta(lomake, jasenetContainer);
       }
+      else if (jasenKentat.length === 2) {  // Jätetään aina kaksi tyhjää kenttää
+        return;
+      }
       else if (tyhjatKentat > 1) {
         poistaJasenKentta(lomake, jasenetContainer);
       }
     }
   });
-  
 
 
   /**
@@ -453,6 +467,7 @@ let start = function(data) {
    * Tarkistaa joukkueen nimen ja jäsenten kentät. Jos tarkistukset epäonnistuvat,
    * funktio estää lomakkeen lähettämisen ja asettaa virheilmoituksen.
    *
+   * @listens click
    * @param {Event} event - click-tapahtuman tiedot.
    */
   submitPainike.addEventListener('click',  function(event) {
@@ -471,13 +486,14 @@ let start = function(data) {
    * Estää lomakkeen automaattisen lähettämisen, täydentää joukkueobjektin,
    * lisää sen tietorakenteeseen, ja tallentaa päivitetyn datan LocalStorageen.
    *
+   * @listens submit
    * @param {Event} event - submit-tapahtuman tiedot.
    */
   lomake.addEventListener("submit", function(event) {
     console.log("Submit-tapahtumankäsittelijä aktivoitu"); 
     event.preventDefault();  // Estetään lomakkeen automaattinen lähetys
 
-    luoJaLisaaJoukkue(data, lomake);  // Täydentää joukkueobjektin
+    luoJaLisaaJoukkue(data, lomake);
     lomake.reset();
 
     localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
