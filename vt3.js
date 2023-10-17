@@ -107,15 +107,15 @@ let start = function(data) {
     lomake.reset();  // Tyhjennetään aluksi entiset lomaketiedot
     let jasenKentat = lomake.elements['jasen'];
 
-    // Poistetaan ylimääräiset jäsenkentät
-    while (jasenKentat.length > 2) {
-      poistaJasenKentta(lomake, jasenetContainer);
-      jasenKentat = lomake.elements['jasen'];  // Päivitetään jäsenkentät
-    }
-
-    while (jasenKentat.length <= joukkue.jasenet.length) {
-      lisaaJasenKentta(lomake, jasenetContainer);
-      jasenKentat = lomake.elements['jasen'];  // Päivitetään jäsenkentät
+    // Säädetään lomakekenttien määrä oikeaksi
+    const kohdeKenttienMaara = joukkue.jasenet.length + 1;  // +1 yhdelle tyhjälle kentälle
+    while (jasenKentat.length !== kohdeKenttienMaara) {
+      if (jasenKentat.length < kohdeKenttienMaara) {
+        lisaaJasenKentta(lomake, jasenetContainer);
+      } else if (jasenKentat.length > 2) {  // Varmistetaan, että aina väh. 2 tyhjää kenttää
+        poistaJasenKentta(lomake, jasenetContainer);
+      }
+      jasenKentat = lomake.elements['jasen'];
     }
 
     // Täytetään perustiedot
