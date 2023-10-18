@@ -104,7 +104,7 @@ let start = function(data) {
 
 
   function taytaLomake(lomake, joukkue) {
-    lomake.reset();  // Tyhjennetään aluksi entiset lomaketiedot
+    lomake.reset();  // Tyhjennetään entiset lomaketiedot
     let jasenKentat = lomake.elements['jasen'];
 
     // Säädetään lomakekenttien määrä oikeaksi
@@ -134,6 +134,7 @@ let start = function(data) {
         leimaus.checked = true;
       }
     }
+    poistaJoukkue(data, joukkue);  // Poistetaan kyseinen joukkue, jotta se voidaan lisätä uudelleen
   }
 
 
@@ -263,6 +264,18 @@ let start = function(data) {
     }
 
     data.joukkueet.push(uusiJoukkue);  // Lisätään tietorakenteeseen
+  }
+
+
+  function poistaJoukkue(data, joukkue) {
+    console.log("Joukkueen poistaminen aktivoitu");
+
+    const joukkueenNimi = joukkue.joukkue;
+    const joukkueIndeksi = data.joukkueet.findIndex((joukkue) => joukkue.joukkue === joukkueenNimi);
+
+    if (joukkueIndeksi !== -1) {  // Joukkuetta ei löytynyt
+      data.joukkueet.splice(joukkueIndeksi, 1);
+    }
   }
 
 
