@@ -227,64 +227,65 @@ let start = function(data) {
     joukkue.jasenet.sort((a, b) => a.trim().localeCompare(b.trim()));
   }
 
-/**
- * Luo uuden joukkueen tai muokkaa olemassa olevaa joukkuetta.
- * @param {Object} data - Tietorakenne, jossa joukkueet sijaitsevat.
- * @param {HTMLFormElement} lomake - Lomake-elementti, josta tiedot kerätään.
- */
-function luoJaLisaaJoukkue(data, lomake) {
-  let kohdeJoukkue;
 
   /**
-   * Lisää jäsenet kohdejoukkueeseen.
+   * Luo uuden joukkueen tai muokkaa olemassa olevaa joukkuetta.
+   * @param {Object} data - Tietorakenne, jossa joukkueet sijaitsevat.
    * @param {HTMLFormElement} lomake - Lomake-elementti, josta tiedot kerätään.
    */
-  function lisaaJasenet(lomake) {
-    const jasenKentat = lomake.elements["jasen"];
-    for (let i = 0; i < jasenKentat.length; i++) {
-      const jasen = jasenKentat[i].value;
-      if (jasen !== "") {
-        kohdeJoukkue.jasenet.push(jasen);
+  function luoJaLisaaJoukkue(data, lomake) {
+    let kohdeJoukkue;
+
+    /**
+     * Lisää jäsenet kohdejoukkueeseen.
+     * @param {HTMLFormElement} lomake - Lomake-elementti, josta tiedot kerätään.
+     */
+    function lisaaJasenet(lomake) {
+      const jasenKentat = lomake.elements["jasen"];
+      for (let i = 0; i < jasenKentat.length; i++) {
+        const jasen = jasenKentat[i].value;
+        if (jasen !== "") {
+          kohdeJoukkue.jasenet.push(jasen);
+        }
       }
     }
-  }
 
-  /**
-   * Lisää leimaustavat kohdejoukkueeseen.
-   * @param {HTMLFormElement} lomake - Lomake-elementti, josta tiedot kerätään.
-   */
-  function lisaaLeimaustavat(lomake) {
-    const leimausKentat = lomake.elements["leimaustapa"];
-    for (let i = 0; i < leimausKentat.length; i++) {
-      if (leimausKentat[i].checked) {
-        kohdeJoukkue.leimaustapa.push(Number(leimausKentat[i].value));
+    /**
+     * Lisää leimaustavat kohdejoukkueeseen.
+     * @param {HTMLFormElement} lomake - Lomake-elementti, josta tiedot kerätään.
+     */
+    function lisaaLeimaustavat(lomake) {
+      const leimausKentat = lomake.elements["leimaustapa"];
+      for (let i = 0; i < leimausKentat.length; i++) {
+        if (leimausKentat[i].checked) {
+          kohdeJoukkue.leimaustapa.push(Number(leimausKentat[i].value));
+        }
       }
     }
-  }
 
-  if (valittuJoukkue !== null) {  // Muokattava joukkue
-    kohdeJoukkue = valittuJoukkue;
-    kohdeJoukkue.jasenet = [];
-    kohdeJoukkue.leimaustapa = [];
-    kohdeJoukkue.joukkue = lomake.elements['nimi'].value;
-  } else {  // Uusi joukkue
-    kohdeJoukkue = {
-      aika: 0,
-      jasenet: [],
-      joukkue: lomake["nimi"].value,
-      leimaustapa: [],
-      matka: 0,
-      pisteet: 0,
-      rastileimaukset: [],
-      sarja: Number(lomake["sarja"].value)
-    };
-    data.joukkueet.push(kohdeJoukkue);
-  }
+    if (valittuJoukkue !== null) {  // Muokattava joukkue
+      kohdeJoukkue = valittuJoukkue;
+      kohdeJoukkue.jasenet = [];
+      kohdeJoukkue.leimaustapa = [];
+      kohdeJoukkue.joukkue = lomake.elements['nimi'].value;
+    } else {  // Uusi joukkue
+      kohdeJoukkue = {
+        aika: 0,
+        jasenet: [],
+        joukkue: lomake["nimi"].value,
+        leimaustapa: [],
+        matka: 0,
+        pisteet: 0,
+        rastileimaukset: [],
+        sarja: Number(lomake["sarja"].value)
+      };
+      data.joukkueet.push(kohdeJoukkue);
+    }
 
-  // Lisätään jäsenet ja leimaustavat kohdejoukkueeseen
-  lisaaJasenet(lomake);
-  lisaaLeimaustavat(lomake);
-} 
+    // Lisätään jäsenet ja leimaustavat kohdejoukkueeseen
+    lisaaJasenet(lomake);
+    lisaaLeimaustavat(lomake);
+  } 
 
 
   /**
@@ -321,6 +322,38 @@ function luoJaLisaaJoukkue(data, lomake) {
       
       label.textContent = "Jäsen " + (i + 1);
       
+    }
+  }
+
+
+  function lisaaRuksit(jasenKentat) {
+    let taytettyja = 0;
+
+    // Lasketaan täytettyjen kenttien määrä
+    for (let i = 0; i < jasenKentat.length; i++) {
+      if (jasenKentat[i].value.trim() !== '') {
+        taytettyja++;
+      }
+    }
+
+    // Käydään läpi kaikki kentät uudelleen
+    for (let i = 0; i < jasenKentat.length; i++) {
+      const kentta = jasenKentat[i];
+      const container = kentta.parentNode;
+
+      // Poista vanha ruksi, jos sellainen on
+      const vanhaRuksi = container.querySelector('.remove-btn');
+      if (vanhaRuksi) {
+        container.removeChild(vanhaRuksi);
+      }
+
+      // Lisää uusi ruksi, jos ehdot täyttyvät
+      if (taytettyja > 2 && kentta.value.trim() !== '') {
+        const uusiRuksi = document.createElement('span');
+        uusiRuksi.className = 'remove-btn';
+        uusiRuksi.textContent = '✕';
+        container.appendChild(uusiRuksi);
+      }
     }
   }
   
@@ -539,6 +572,8 @@ function luoJaLisaaJoukkue(data, lomake) {
       else if (tyhjatKentat > 1) {
         poistaJasenKentta(lomake, jasenetContainer);
       }
+
+      lisaaRuksit(jasenKentat);
     }
   });
 
