@@ -319,12 +319,12 @@ let start = function(data) {
    * @param {HTMLFormElement} lomake - Lomake-elementti, jossa jäsenkentät ovat.
    */
   function paivitaJasentenNumerointi(lomake) {
-    const jasenKentat = lomake.elements['jasen'];
+    const jasenKentat = lomake.jasen;
     
     for (let i = 0; i < jasenKentat.length; i++) {
       const kentta = jasenKentat[i];
       const container = kentta.parentNode;
-      const label = container.querySelector('span');
+      const label = container.querySelector('label');
       
       label.textContent = "Jäsen " + (i + 1);
       
@@ -364,7 +364,7 @@ let start = function(data) {
       if (taytettyja > 2 && kentta.value.trim() !== '') {
         const uusiRuksi = document.createElement('span');
         uusiRuksi.className = 'remove-btn';
-        uusiRuksi.textContent = '✕';
+        uusiRuksi.textContent = 'x';
         container.appendChild(uusiRuksi);
       }
     }
@@ -384,7 +384,7 @@ let start = function(data) {
     uusiKentta.className = "label-container";
 
     // Lisätään uusi span-elementti labeliksi
-    const uusiLabel = document.createElement("span");
+    const uusiLabel = document.createElement("label");
     uusiLabel.textContent = "Jäsen";  // Numerointi päivitetään myöhemmin
 
     // Luodaan uusi input-elementti
