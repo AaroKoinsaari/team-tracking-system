@@ -227,69 +227,64 @@ let start = function(data) {
     joukkue.jasenet.sort((a, b) => a.trim().localeCompare(b.trim()));
   }
 
+/**
+ * Luo uuden joukkueen tai muokkaa olemassa olevaa joukkuetta.
+ * @param {Object} data - Tietorakenne, jossa joukkueet sijaitsevat.
+ * @param {HTMLFormElement} lomake - Lomake-elementti, josta tiedot kerätään.
+ */
+function luoJaLisaaJoukkue(data, lomake) {
+  let kohdeJoukkue;
 
   /**
-   * Luo uuden joukkue-objektin ja lisää sen annettuun tietorakenteeseen.
-   *
-   * @param {Object} data - Tietorakenne, johon uusi joukkue lisätään.
-   * @param {HTMLFormElement} lomake - Lomake-elementti, josta uuden joukkueen tiedot otetaan.
+   * Lisää jäsenet kohdejoukkueeseen.
+   * @param {HTMLFormElement} lomake - Lomake-elementti, josta tiedot kerätään.
    */
-  function luoJaLisaaJoukkue(data, lomake) {
-    if (valittuJoukkue !== null) {
-      
-      // Tyhjennetään vanhat tiedot
-      valittuJoukkue.jasenet = [];
-      valittuJoukkue.leimaustapa = [];
-
-      valittuJoukkue.joukkue = lomake.elements['nimi'].value;
-
-      // Lisätään vain ei-tyhjät jäsenet taulukkoon
-      const jasenKentat = lomake.elements["jasen"];
-      for (let i = 0; i < jasenKentat.length; i++) {
-        const jasen = jasenKentat[i].value;
-        if (jasen !== "") {
-          valittuJoukkue.jasenet.push(jasen);
-        }
+  function lisaaJasenet(lomake) {
+    const jasenKentat = lomake.elements["jasen"];
+    for (let i = 0; i < jasenKentat.length; i++) {
+      const jasen = jasenKentat[i].value;
+      if (jasen !== "") {
+        kohdeJoukkue.jasenet.push(jasen);
       }
-      // Otetaan talteen leimaustavat
-      const leimausKentat = lomake.elements["leimaustapa"];
-      for (let i = 0; i < leimausKentat.length; i++) {
-        if (leimausKentat[i].checked) {
-          valittuJoukkue.leimaustapa.push(Number(leimausKentat[i].value));
-        }
-      }
-    } else {
-      const uusiJoukkue = {
-        aika: 0,
-        jasenet: [],
-        joukkue: lomake["nimi"].value,
-        leimaustapa: [],
-        matka: 0,
-        pisteet: 0,
-        rastileimaukset: [],
-        sarja: Number(lomake["sarja"].value)  // Tulee merkkijonona, joten muutetaan numeroksi
-      };
-  
-      // Lisätään vain ei-tyhjät jäsenet taulukkoon
-      const jasenKentat = lomake.elements["jasen"];
-      for (let i = 0; i < jasenKentat.length; i++) {
-        const jasen = jasenKentat[i].value;
-        if (jasen !== "") {
-          uusiJoukkue.jasenet.push(jasen);
-        }
-      }
-  
-      // Otetaan talteen leimaustavat
-      const leimausKentat = lomake.elements["leimaustapa"];
-      for (let i = 0; i < leimausKentat.length; i++) {
-        if (leimausKentat[i].checked) {
-          uusiJoukkue.leimaustapa.push(Number(leimausKentat[i].value));
-        }
-      }
-  
-      data.joukkueet.push(uusiJoukkue);
     }
   }
+
+  /**
+   * Lisää leimaustavat kohdejoukkueeseen.
+   * @param {HTMLFormElement} lomake - Lomake-elementti, josta tiedot kerätään.
+   */
+  function lisaaLeimaustavat(lomake) {
+    const leimausKentat = lomake.elements["leimaustapa"];
+    for (let i = 0; i < leimausKentat.length; i++) {
+      if (leimausKentat[i].checked) {
+        kohdeJoukkue.leimaustapa.push(Number(leimausKentat[i].value));
+      }
+    }
+  }
+
+  if (valittuJoukkue !== null) {  // Muokattava joukkue
+    kohdeJoukkue = valittuJoukkue;
+    kohdeJoukkue.jasenet = [];
+    kohdeJoukkue.leimaustapa = [];
+    kohdeJoukkue.joukkue = lomake.elements['nimi'].value;
+  } else {  // Uusi joukkue
+    kohdeJoukkue = {
+      aika: 0,
+      jasenet: [],
+      joukkue: lomake["nimi"].value,
+      leimaustapa: [],
+      matka: 0,
+      pisteet: 0,
+      rastileimaukset: [],
+      sarja: Number(lomake["sarja"].value)
+    };
+    data.joukkueet.push(kohdeJoukkue);
+  }
+
+  // Lisätään jäsenet ja leimaustavat kohdejoukkueeseen
+  lisaaJasenet(lomake);
+  lisaaLeimaustavat(lomake);
+} 
 
 
   /**
