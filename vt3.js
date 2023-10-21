@@ -104,6 +104,7 @@ let start = function(data) {
 
 
   function taytaLomake(lomake, joukkue) {
+    valittuJoukkue = joukkue;  // Päivitetään nykyinen joukkue
     lomake.reset();  // Tyhjennetään aluksi entiset lomaketiedot
     let jasenKentat = lomake.elements['jasen'];
 
@@ -234,35 +235,60 @@ let start = function(data) {
    * @param {HTMLFormElement} lomake - Lomake-elementti, josta uuden joukkueen tiedot otetaan.
    */
   function luoJaLisaaJoukkue(data, lomake) {
-    const uusiJoukkue = {
-      aika: 0,
-      jasenet: [],
-      joukkue: lomake["nimi"].value,
-      leimaustapa: [],
-      matka: 0,
-      pisteet: 0,
-      rastileimaukset: [],
-      sarja: Number(lomake["sarja"].value)  // Tulee merkkijonona, joten muutetaan numeroksi
-    };
+    if (valittuJoukkue !== null) {
+      
+      // Tyhjennetään vanhat tiedot
+      valittuJoukkue.jasenet = [];
+      valittuJoukkue.leimaustapa = [];
 
-    // Lisätään vain ei-tyhjät jäsenet taulukkoon
-    const jasenKentat = lomake.elements["jasen"];
-    for (let i = 0; i < jasenKentat.length; i++) {
-      const jasen = jasenKentat[i].value;
-      if (jasen !== "") {
-        uusiJoukkue.jasenet.push(jasen);
+      valittuJoukkue.joukkue = lomake.elements['nimi'].value;
+
+      // Lisätään vain ei-tyhjät jäsenet taulukkoon
+      const jasenKentat = lomake.elements["jasen"];
+      for (let i = 0; i < jasenKentat.length; i++) {
+        const jasen = jasenKentat[i].value;
+        if (jasen !== "") {
+          valittuJoukkue.jasenet.push(jasen);
+        }
       }
-    }
-
-    // Otetaan talteen leimaustavat
-    const leimausKentat = lomake.elements["leimaustapa"];
-    for (let i = 0; i < leimausKentat.length; i++) {
-      if (leimausKentat[i].checked) {
-        uusiJoukkue.leimaustapa.push(Number(leimausKentat[i].value));
+      // Otetaan talteen leimaustavat
+      const leimausKentat = lomake.elements["leimaustapa"];
+      for (let i = 0; i < leimausKentat.length; i++) {
+        if (leimausKentat[i].checked) {
+          valittuJoukkue.leimaustapa.push(Number(leimausKentat[i].value));
+        }
       }
+    } else {
+      const uusiJoukkue = {
+        aika: 0,
+        jasenet: [],
+        joukkue: lomake["nimi"].value,
+        leimaustapa: [],
+        matka: 0,
+        pisteet: 0,
+        rastileimaukset: [],
+        sarja: Number(lomake["sarja"].value)  // Tulee merkkijonona, joten muutetaan numeroksi
+      };
+  
+      // Lisätään vain ei-tyhjät jäsenet taulukkoon
+      const jasenKentat = lomake.elements["jasen"];
+      for (let i = 0; i < jasenKentat.length; i++) {
+        const jasen = jasenKentat[i].value;
+        if (jasen !== "") {
+          uusiJoukkue.jasenet.push(jasen);
+        }
+      }
+  
+      // Otetaan talteen leimaustavat
+      const leimausKentat = lomake.elements["leimaustapa"];
+      for (let i = 0; i < leimausKentat.length; i++) {
+        if (leimausKentat[i].checked) {
+          uusiJoukkue.leimaustapa.push(Number(leimausKentat[i].value));
+        }
+      }
+  
+      data.joukkueet.push(uusiJoukkue);
     }
-
-    data.joukkueet.push(uusiJoukkue);  // Lisätään tietorakenteeseen
   }
 
 
@@ -389,7 +415,7 @@ let start = function(data) {
    * @param {Object} data - Data, josta tarkistetaan muiden joukkueiden nimet.
    * @returns {boolean} true, jos nimi on kelvollinen; false, jos ei.
    */
-  function tarkistaJoukkueenNimi(lomake, data) {
+  function tarkistaJoukkueenNimi(lomake, data, muokattavaJoukkue) {
     const nimiKentta = lomake.elements["nimi"];
     const nimiValue = nimiKentta.value.trim().toLowerCase();
     
@@ -401,14 +427,18 @@ let start = function(data) {
     }
 
     // Tarkistetaan, että nimi on uniikki koko datassa
-    const joukkueidenNimet = data.joukkueet.map(joukkue => joukkue.joukkue);
-    joukkueidenNimet.push(nimiValue);
-    if (!ovatkoNimetUniikkeja(joukkueidenNimet)) {
-      nimiKentta.setCustomValidity("Joukkueen nimen on oltava uniikki");
-      nimiKentta.reportValidity();
-      return false;
+    for (const joukkue of data.joukkueet) {
+      if (joukkue.joukkue.toLowerCase() === nimiValue) {
+        // Jos kyseessä on muokattava joukkue, nimen samankaltaisuus on sallittu
+        if (muokattavaJoukkue && joukkue.joukkue === muokattavaJoukkue.joukkue) {
+          console.log("Muokattava joukkue tunnistettu");
+          continue;
+        }
+        nimiKentta.setCustomValidity("Joukkueen nimen on oltava uniikki");
+        nimiKentta.reportValidity();
+        return false;
+      }
     }
-
     // Tyhjennetään mahdollinen aikaisempi virheilmoitus
     nimiKentta.setCustomValidity("");
     return true;
@@ -478,6 +508,7 @@ let start = function(data) {
   const lomake = document.forms[0];
   const sarjat = data.sarjat;
   const leimaustavat = data.leimaustavat;
+  let valittuJoukkue = null;
   const submitPainike = lomake.elements["submit"];
 
   const jasenetContainer = document.getElementById('jasenetContainer');
@@ -528,7 +559,7 @@ let start = function(data) {
   submitPainike.addEventListener('click',  function(event) {
     console.log("Click-tapahtumankäsittelijä aktivoitu"); 
 
-    if (!tarkistaJoukkueenNimi(lomake, data) ||
+    if (!tarkistaJoukkueenNimi(lomake, data, valittuJoukkue) ||
         !tarkistaLeimaustapa(lomake) ||
         !tarkistaJasenet(lomake)) {
       event.preventDefault();  // Estetään lähetys epäonnistuessa
