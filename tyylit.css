@@ -28,7 +28,7 @@ legend {
 
 .label-container input[type="text"], 
 .label-container label {
-    flex: 0 0 50%; /* Vie puolet tilasta eikä veny tai kutistu */
+    flex: 0 0 45%;
 }
 
 #sarjatContainer label, #leimaustavatContainer label {
@@ -38,6 +38,15 @@ legend {
 
 #sarjatContainer input[type="radio"] {
     margin-left: 0.5rem; /* Ulkoinen marginaali vasemmalla */
+}
+
+/* .jasen-kentta {
+    padding-right: 10px;
+} */
+
+.remove-btn {
+    color: red;
+    margin-left: 5px;
 }
 
 input[type="submit"] {
