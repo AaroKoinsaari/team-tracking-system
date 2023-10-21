@@ -103,6 +103,12 @@ let start = function(data) {
   }
 
 
+  /**
+  * Täyttää annetun HTML-lomake-elementin joukkueen tiedoilla.
+  *
+  * @param {HTMLFormElement} lomake - Lomake-elementti, josta tiedot kerätään.
+  * @param {Object} joukkue - Joukkueobjekti, joka sisältää tiedot.
+  */
   function taytaLomake(lomake, joukkue) {
     valittuJoukkue = joukkue;  // Päivitetään nykyinen joukkue
     lomake.reset();  // Tyhjennetään aluksi entiset lomaketiedot
@@ -326,6 +332,13 @@ let start = function(data) {
   }
 
 
+  /**
+   * Lisää tai poistaa "poista"-ruksin jäsenkenttien viereen lomakkeella.
+   * Ruksit lisätään, jos täytettyjä kenttiä on enemmän kuin kaksi.
+   * Jos kenttiä on jäljellä vain kaksi tai vähemmän, ruksit poistetaan.
+   *
+   * @param {HTMLCollection} jasenKentat - Lomakkeen input-jäsenkentät.
+   */
   function lisaaRuksit(jasenKentat) {
     let taytettyja = 0;
 
