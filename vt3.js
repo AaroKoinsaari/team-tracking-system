@@ -79,7 +79,7 @@ let start = function(data) {
 
 
   /**
-   * Järjestää ja luo leimaustavat sivun lomakkeelle.
+   * Päivittää leimaustapojen listan sivulla korvaamalla mahdollisen vanhan listauksen uudella.
    *
    * @param {Array} leimaustavatData - Leimaustavat taulukossa.
    */
@@ -586,6 +586,12 @@ let start = function(data) {
   }
 
 
+  /**
+   * Tarkistaa, että annettu leimaustavan nimi on kelvollinen ja uniikki.
+   * 
+   * @param {HTMLFormElement} lomake - Lomake, josta leimaustavan nimi haetaan.
+   * @returns {boolean} - true, jos nimi on kelvollinen ja uniikki, muuten false.
+   */
   function tarkistaLeimaustavanNimi(lomake) {
     const leimaustavat = [...data.leimaustavat]; // Kopioidaan taulukko, ettei alkuperäinen data muutu
     const leimaustapaKentta = lomake.elements["uusiLeimaustapa"];
@@ -608,10 +614,9 @@ let start = function(data) {
     leimaustapaKentta.setCustomValidity("");  // Tyhjennetään mahdollinen aiempi virheilmoitus
 
     return true;
-}
+  }
 
   
-
   const lomake = document.forms[0];
   const leimaustapaLomake = document.forms[1];
   const sarjat = data.sarjat;
@@ -660,7 +665,7 @@ let start = function(data) {
 
 
   /**
-   * Käsittelee click-tapahtuman.
+   * Käsittelee submit-painikkeen click-tapahtuman.
    * Tarkistaa joukkueen nimen ja jäsenten kentät. Jos tarkistukset epäonnistuvat,
    * funktio estää lomakkeen lähettämisen ja asettaa virheilmoituksen.
    *
@@ -706,6 +711,14 @@ let start = function(data) {
   });
 
 
+  /**
+   * Käsittelee leimaustapalomakkeen submit-painikkeen click-tapahtuman.
+   * Suorittaa lomakkeen syötteen tarkistuksen ja estää lomakkeen lähettämisen,
+   * mikäli tarkistus ei mene läpi.
+   * 
+   * @listens click
+   * @param {Event} event - click-tapahtuman tiedot.
+   */
   submitPainikeLeimaustapa.addEventListener('click', function(event) {
     console.log("Leimaustavan click-tapahtuma aktivoitu");
     if(!tarkistaLeimaustavanNimi(leimaustapaLomake)) {
@@ -714,6 +727,14 @@ let start = function(data) {
   });
 
 
+  /**
+   * Tapahtumankuuntelija leimaustapalomakkeen submit-tapahtumalle.
+   * Suorittaa leimaustavan lisäämisen dataan, tallentaa sen localStorageen,
+   * nollaa lomakkeen ja päivittää leimaustavat sivulle.
+   * 
+   * @listens submit
+   * @param {Event} event - submit-tapahtuman tiedot.
+   */
   leimaustapaLomake.addEventListener('submit', function(event) {
     console.log("Leimaustavan submit-tapahtumankäsittelijä aktivoitu"); 
     event.preventDefault();  // Estetään lomakkeen automaattinen lähetys
