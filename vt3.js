@@ -579,13 +579,41 @@ let start = function(data) {
     ekaKentta.setCustomValidity("");  // Tyhjennetään mahdollinen aiempi virheilmoitus
     return true;
   }
+
+
+  function tarkistaLeimaustavanNimi(lomake) {
+    const leimaustavat = [...data.leimaustavat]; // Kopioidaan taulukko, ettei alkuperäinen data muutu
+    const leimaustapaKentta = lomake.elements["uusiLeimaustapa"];
+    const leimaustavanNimi = leimaustapaKentta.value.trim().toLowerCase();
+
+    if (leimaustavanNimi.length < 2) {
+      leimaustapaKentta.setCustomValidity("Leimaustavan on oltava vähintään kaksi merkkiä pitkä");
+      leimaustapaKentta.reportValidity();
+      return false;
+    }
+    leimaustapaKentta.setCustomValidity("");
+
+    leimaustavat.push(leimaustavanNimi);  // Lisätään leimaustapa tarkistuksen jälkeen
+
+    if (!ovatkoNimetUniikkeja(leimaustavat)) {
+      leimaustapaKentta.setCustomValidity("Leimaustavan on oltava uniikki");
+      leimaustapaKentta.reportValidity();
+      return false;
+    }
+    leimaustapaKentta.setCustomValidity("");  // Tyhjennetään mahdollinen aiempi virheilmoitus
+
+    return true;
+}
+
   
 
   const lomake = document.forms[0];
+  const leimaustapaLomake = document.forms[1];
   const sarjat = data.sarjat;
   const leimaustavat = data.leimaustavat;
   let valittuJoukkue = null;
   const submitPainike = lomake.elements["submit"];
+  const submitPainikeLeimaustapa = leimaustapaLomake.elements["submit"];
 
   const jasenetContainer = document.getElementById('jasenetContainer');
 
@@ -653,7 +681,7 @@ let start = function(data) {
    * @listens submit
    * @param {Event} event - submit-tapahtuman tiedot.
    */
-  lomake.addEventListener("submit", function(event) {
+  lomake.addEventListener('submit', function(event) {
     console.log("Submit-tapahtumankäsittelijä aktivoitu"); 
     event.preventDefault();  // Estetään lomakkeen automaattinen lähetys
 
@@ -670,6 +698,27 @@ let start = function(data) {
 
     localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
     paivitaJoukkueLista(data);
+  });
+
+
+  submitPainikeLeimaustapa.addEventListener('click', function(event) {
+    console.log("Leimaustavan click-tapahtuma aktivoitu");
+    if(!tarkistaLeimaustavanNimi(leimaustapaLomake)) {
+      event.preventDefault();  // Estetään lähetys epäonnistuessa
+    }
+  });
+
+
+  leimaustapaLomake.addEventListener('submit', function(event) {
+    console.log("Leimaustavan submit-tapahtumankäsittelijä aktivoitu"); 
+    event.preventDefault();  // Estetään lomakkeen automaattinen lähetys
+
+    const leimaustapa = leimaustapaLomake.uusiLeimaustapa.value;
+    data.leimaustavat.push(leimaustapa);
+    leimaustapaLomake.reset();
+
+    localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
+    jarjestaJaLuoLeimaustavat(data.leimaustavat);
   });
 
   console.log(data);
