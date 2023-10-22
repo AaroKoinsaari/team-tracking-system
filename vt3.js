@@ -88,6 +88,11 @@ let start = function(data) {
 
     const leimaustavatContainer = document.getElementById('leimaustavatContainer');
 
+    // Tyhjennetään containerin sisältö
+    while (leimaustavatContainer.firstChild) {
+      leimaustavatContainer.removeChild(leimaustavatContainer.firstChild);
+    }
+
     for (const [index, leimaustapa] of leimaustavatData.entries()) {
       const label = document.createElement('label');
       const input = document.createElement('input');
