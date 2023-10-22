@@ -440,7 +440,20 @@ let start = function(data) {
   
     paivitaJasentenNumerointi(lomake);
   }
+
   
+  /**
+   * Poistaa kaikki määritellyt alielementit annetusta containerista.
+   *
+   * @param {HTMLElement} container - Ylemmän tason elementti, josta alielementit poistetaan.
+   * @param {string} selector - CSS-selektori, joka määrittelee poistettavat alielementit.
+   */
+  function poistaElementit(container, selector) {
+    const poistettavatElementit = container.querySelectorAll(selector);
+    poistettavatElementit.forEach(function(element) {
+      element.parentNode.removeChild(element);      
+    });
+  }
 
 
   /**
@@ -648,6 +661,9 @@ let start = function(data) {
     while (lomake.elements['jasen'].length > 2) {
       poistaJasenKentta(lomake, jasenetContainer);
     }
+
+    // Poistetaan mahdollisesti jääneet ruksit
+    poistaElementit(jasenetContainer, '.remove-btn');
 
     localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
 
