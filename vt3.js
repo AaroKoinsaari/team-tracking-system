@@ -134,6 +134,9 @@ let start = function(data) {
       jasenKentat[i].value = joukkue.jasenet[i];
     }
 
+    // Lisätään ruksit jäsenkentille, jos niitä on enemmän kuin kaksi
+    lisaaRuksit(jasenKentat);
+
     // Täytetään leimaustavat
     const leimaustapaKentat = lomake.elements['leimaustapa'];
     for (const leimaus of leimaustapaKentat) {
@@ -441,7 +444,7 @@ let start = function(data) {
     paivitaJasentenNumerointi(lomake);
   }
 
-  
+
   /**
    * Poistaa kaikki määritellyt alielementit annetusta containerista.
    *
@@ -666,7 +669,6 @@ let start = function(data) {
     poistaElementit(jasenetContainer, '.remove-btn');
 
     localStorage.setItem("TIEA2120-vt3-2023s", JSON.stringify(data));  // Tallenetaan päivitetty data
-
     paivitaJoukkueLista(data);
   });
 
