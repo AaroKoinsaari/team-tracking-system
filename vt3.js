@@ -48,6 +48,19 @@ window.addEventListener("load", alustus);
 let start = function(data) {
 
   /**
+  * Poistaa samannimiset leimaustavat datasta.
+  *
+  * @param {Object} data - Data, joka sisältää leimaustavat taulukon.
+  * @returns {Object} Päivitetty data ilman leimaustapojen duplikaatteja.
+  */
+  function poistaDuplikaattiLeimaustavat(data) {
+    // Muutetaan leimaustavat Set-rakenteeksi, jotta saadaan duplikaatit poistettua
+    data.leimaustavat = [...new Set(data.leimaustavat)];
+    return data;
+  }
+
+
+  /**
    * Järjestää sarjat aakkosjärjestykseen ja luo HTML-radiobuttonit niille.
    * Ensimmäinen radiobutton valitaan oletuksena.
    *
@@ -84,7 +97,7 @@ let start = function(data) {
    * @param {Array} leimaustavatData - Leimaustavat taulukossa.
    */
   function jarjestaJaLuoLeimaustavat(leimaustavatData) {
-    leimaustavatData.sort((a, b) => a.localeCompare(b));  // Järjestetään aakkosjärjestykseen
+    const jarjestettyData = [...leimaustavatData].sort((a, b) => a.localeCompare(b));  // Järjestetään kopio aakkosjärjestykseen
 
     const leimaustavatContainer = document.getElementById('leimaustavatContainer');
 
@@ -93,19 +106,20 @@ let start = function(data) {
       leimaustavatContainer.removeChild(leimaustavatContainer.firstChild);
     }
 
-    for (const [index, leimaustapa] of leimaustavatData.entries()) {
+    for (const leimaustapa of jarjestettyData) {
       const label = document.createElement('label');
       const input = document.createElement('input');
       input.type = 'checkbox';
       input.name = 'leimaustapa';
-      input.value = index;
+      // Käytetään alkuperäisen taulukon indeksiä, ei järjestetyn taulukon indeksiä
+      input.value = leimaustavatData.indexOf(leimaustapa);
 
       label.appendChild(document.createTextNode(' ' + leimaustapa));
       label.appendChild(input);
-
       leimaustavatContainer.appendChild(label);
     }
   }
+
 
 
   /**
@@ -616,7 +630,8 @@ let start = function(data) {
     return true;
   }
 
-  
+  poistaDuplikaattiLeimaustavat(data);
+
   const lomake = document.forms[0];
   const leimaustapaLomake = document.forms[1];
   const sarjat = data.sarjat;
