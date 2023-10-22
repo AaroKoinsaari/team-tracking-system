@@ -334,8 +334,9 @@ let start = function(data) {
 
   /**
    * Lisää tai poistaa "poista"-ruksin jäsenkenttien viereen lomakkeella.
-   * Ruksit lisätään, jos täytettyjä kenttiä on enemmän kuin kaksi.
+   * Jos lomakkeella on täytettyjä kenttiä enemmän kuin kaksi, ruksit lisätään. 
    * Jos kenttiä on jäljellä vain kaksi tai vähemmän, ruksit poistetaan.
+   * Ruksin klikkaaminen poistaa sen vieressä olevan kentän lomakkeelta ja päivittää ruksien määrän.
    *
    * @param {HTMLCollection} jasenKentat - Lomakkeen input-jäsenkentät.
    */
@@ -344,9 +345,9 @@ let start = function(data) {
 
     // Lasketaan täytettyjen kenttien määrä
     for (let i = 0; i < jasenKentat.length; i++) {
-      if (jasenKentat[i].value.trim() !== '') {
-        taytettyja++;
-      }
+        if (jasenKentat[i].value.trim() !== '') {
+            taytettyja++;
+        }
     }
 
     // Käydään läpi kaikki kentät uudelleen
@@ -357,19 +358,25 @@ let start = function(data) {
       // Poista vanha ruksi, jos sellainen on
       const vanhaRuksi = container.querySelector('.remove-btn');
       if (vanhaRuksi) {
-        container.removeChild(vanhaRuksi);
+          container.removeChild(vanhaRuksi);
       }
 
       // Lisää uusi ruksi, jos ehdot täyttyvät
       if (taytettyja > 2 && kentta.value.trim() !== '') {
-        const uusiRuksi = document.createElement('span');
-        uusiRuksi.className = 'remove-btn';
-        uusiRuksi.textContent = 'x';
-        container.appendChild(uusiRuksi);
+          const uusiRuksi = document.createElement('span');
+          uusiRuksi.className = 'remove-btn';
+          uusiRuksi.textContent = 'x';
+          container.appendChild(uusiRuksi);
+
+        // click-tapahtumankuuntelija ruksin painallukselle
+        uusiRuksi.addEventListener('click', function() {
+            poistaJasenKentta(lomake, jasenetContainer, kentta);
+            lisaaRuksit(jasenKentat);
+        });
       }
     }
   }
-  
+
 
   /**
    * Lisää uuden jäsenkentän lomakkeeseen.
@@ -406,22 +413,34 @@ let start = function(data) {
 
 
   /**
-   * Poistaa ensimmäisen tyhjän jäsenkentän lomakkeesta.
+   * Poistaa joko annetun jäsenkentän tai ensimmäisen tyhjän jäsenkentän lomakkeesta.
+   * 
+   * Jos `poistettavaKentta`-parametri annetaan, poistetaan kyseinen kenttä. 
+   * Jos sitä ei anneta, poistetaan ensimmäinen tyhjä jäsenkenttä.
    *
    * @param {HTMLFormElement} lomake - Lomake-elementti, josta jäsenkenttä poistetaan.
    * @param {HTMLElement} jasenetContainer - div-elementti, joka sisältää kaikki jäsenkentät.
+   * @param {HTMLInputElement|null} [poistettavaKentta=null] - Valinnainen jäsenkenttä, joka halutaan poistaa.
+   *                                                           Jos ei annettu, poistetaan ensimmäinen tyhjä kenttä.
    */
-  function poistaJasenKentta(lomake, jasenetContainer) {
+  function poistaJasenKentta(lomake, jasenetContainer, poistettavaKentta = null) {
     const jasenKentat = lomake.elements['jasen'];
-    for (let i = 0; i < jasenKentat.length; i++) {
-      if (jasenKentat[i].value === '') {
-        const parentContainer = jasenKentat[i].parentNode;
-        jasenetContainer.removeChild(parentContainer);
-        break;  // Poistetaan vain yksi tyhjä kenttä
+  
+    if (poistettavaKentta) {
+      jasenetContainer.removeChild(poistettavaKentta.parentNode);
+    } else {
+      for (let i = 0; i < jasenKentat.length; i++) {
+        if (jasenKentat[i].value === '') {
+          const parentContainer = jasenKentat[i].parentNode;
+          jasenetContainer.removeChild(parentContainer);
+          break;  // Poistetaan vain yksi tyhjä kenttä
+        }
       }
     }
+  
     paivitaJasentenNumerointi(lomake);
   }
+  
 
 
   /**
