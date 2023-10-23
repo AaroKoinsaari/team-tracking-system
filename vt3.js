@@ -345,7 +345,8 @@ let start = function(data) {
     
     for (let i = 0; i < jasenKentat.length; i++) {
       const kentta = jasenKentat[i];
-      const container = kentta.parentNode;
+      const inputContainer = kentta.parentNode;
+      const container = inputContainer.parentNode;
       const label = container.querySelector('label');
       
       label.textContent = "Jäsen " + (i + 1);
@@ -375,12 +376,12 @@ let start = function(data) {
     // Käydään läpi kaikki kentät uudelleen
     for (let i = 0; i < jasenKentat.length; i++) {
       const kentta = jasenKentat[i];
-      const container = kentta.parentNode;
+      const inputContainer = kentta.parentNode;
 
       // Poista vanha ruksi, jos sellainen on
-      const vanhaRuksi = container.querySelector('.remove-btn');
+      const vanhaRuksi = inputContainer.querySelector('.remove-btn');
       if (vanhaRuksi) {
-          container.removeChild(vanhaRuksi);
+          inputContainer.removeChild(vanhaRuksi);
       }
 
       // Lisää uusi ruksi, jos ehdot täyttyvät
@@ -388,7 +389,7 @@ let start = function(data) {
           const uusiRuksi = document.createElement('span');
           uusiRuksi.className = 'remove-btn';
           uusiRuksi.textContent = 'x';
-          container.appendChild(uusiRuksi);
+          inputContainer.appendChild(uusiRuksi);
 
         // click-tapahtumankuuntelija ruksin painallukselle
         uusiRuksi.addEventListener('click', function() {
@@ -416,6 +417,9 @@ let start = function(data) {
     const uusiLabel = document.createElement("label");
     uusiLabel.textContent = "Jäsen";  // Numerointi päivitetään myöhemmin
 
+    const inputContainer = document.createElement("div");
+    inputContainer.className = "input-container";
+
     // Luodaan uusi input-elementti
     const uusiInput = document.createElement("input");
     uusiInput.type = "text";
@@ -423,9 +427,11 @@ let start = function(data) {
     uusiInput.className = "jasen-kentta";
     uusiInput.value = "";
 
+    inputContainer.appendChild(uusiInput);
+
     // Lisätään span ja input containeriin
     uusiKentta.appendChild(uusiLabel);
-    uusiKentta.appendChild(uusiInput);
+    uusiKentta.appendChild(inputContainer);
 
     // Lisätään uusi kenttä lomakkeeseen
     jasenetContainer.appendChild(uusiKentta);
@@ -449,12 +455,14 @@ let start = function(data) {
     const jasenKentat = lomake.elements['jasen'];
   
     if (poistettavaKentta) {
-      jasenetContainer.removeChild(poistettavaKentta.parentNode);
+      const grandParentContainer = poistettavaKentta.parentNode.parentNode;  // label-container
+      jasenetContainer.removeChild(grandParentContainer);
     } else {
       for (let i = 0; i < jasenKentat.length; i++) {
         if (jasenKentat[i].value === '') {
-          const parentContainer = jasenKentat[i].parentNode;
-          jasenetContainer.removeChild(parentContainer);
+          const parentContainer = jasenKentat[i].parentNode;  // input-container
+          const grandParentContainer = parentContainer.parentNode;  // label-container
+          jasenetContainer.removeChild(grandParentContainer);
           break;  // Poistetaan vain yksi tyhjä kenttä
         }
       }
