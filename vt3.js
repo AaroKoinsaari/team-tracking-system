@@ -47,17 +47,17 @@ window.addEventListener("load", alustus);
 // oma sovelluskoodi voidaan sijoittaa tähän funktioon
 let start = function(data) {
 
-  /**
-  * Poistaa samannimiset leimaustavat datasta.
-  *
-  * @param {Object} data - Data, joka sisältää leimaustavat taulukon.
-  * @returns {Object} Päivitetty data ilman leimaustapojen duplikaatteja.
-  */
-  function poistaDuplikaattiLeimaustavat(data) {
-    // Muutetaan leimaustavat Set-rakenteeksi, jotta saadaan duplikaatit poistettua
-    data.leimaustavat = [...new Set(data.leimaustavat)];
-    return data;
-  }
+  // /**
+  // * Poistaa samannimiset leimaustavat datasta.
+  // *
+  // * @param {Object} data - Data, joka sisältää leimaustavat taulukon.
+  // * @returns {Object} Päivitetty data ilman leimaustapojen duplikaatteja.
+  // */
+  // function poistaDuplikaattiLeimaustavat(data) {
+  //   // Muutetaan leimaustavat Set-rakenteeksi, jotta saadaan duplikaatit poistettua
+  //   data.leimaustavat = [...new Set(data.leimaustavat)];
+  //   return data;
+  // }
 
 
   /**
@@ -121,7 +121,6 @@ let start = function(data) {
   }
 
 
-
   /**
   * Täyttää annetun HTML-lomake-elementin joukkueen tiedoilla.
   *
@@ -167,7 +166,7 @@ let start = function(data) {
 
 
   /**
-   * Päivittää joukkueiden listan sivulla korvaamalla mahdollisen vanhan listauksen uudella
+   * Päivittää joukkueiden listan sivulla korvaamalla mahdollisen vanhan listauksen uudella.
    *
    * @param {Object} data - Tietorakenne, jossa joukkueet ovat.
    */
@@ -237,8 +236,8 @@ let start = function(data) {
    * Järjestää joukkueet aakkosjärjestykseen nimen perusteella
    * jättäen huomiotta mahdolliset whitespacet nimen alusta ja lopusta.
    * 
-   * @param {Object} joukkueet 
-   * @returns {Array} Aakkosjärjestykseen järjestetty joukkueiden taulukko.
+   * @param {Array} joukkueet - Taulukko joukkue-objekteista.
+   * @returns {Array} - Aakkosjärjestykseen järjestetty joukkueiden taulukko.
    */
   function jarjestaJoukkueet(joukkueet) {
     return joukkueet.sort((a, b) => a.joukkue.trim().localeCompare(b.joukkue.trim()));
@@ -356,7 +355,7 @@ let start = function(data) {
 
 
   /**
-   * Lisää tai poistaa "poista"-ruksin jäsenkenttien viereen lomakkeella.
+   * Lisää tai poistaa ruksin jäsenkenttien vierestä lomakkeella.
    * Jos lomakkeella on täytettyjä kenttiä enemmän kuin kaksi, ruksit lisätään. 
    * Jos kenttiä on jäljellä vain kaksi tai vähemmän, ruksit poistetaan.
    * Ruksin klikkaaminen poistaa sen vieressä olevan kentän lomakkeelta ja päivittää ruksien määrän.
@@ -443,7 +442,7 @@ let start = function(data) {
   /**
    * Poistaa joko annetun jäsenkentän tai ensimmäisen tyhjän jäsenkentän lomakkeesta.
    * 
-   * Jos `poistettavaKentta`-parametri annetaan, poistetaan kyseinen kenttä. 
+   * Jos poistettavaKentta-parametri annetaan, poistetaan kyseinen kenttä. 
    * Jos sitä ei anneta, poistetaan ensimmäinen tyhjä jäsenkenttä.
    *
    * @param {HTMLFormElement} lomake - Lomake-elementti, josta jäsenkenttä poistetaan.
@@ -490,7 +489,7 @@ let start = function(data) {
    * Tarkistaa, ovatko taulukon nimet uniikkeja (case-insensitive ja whitespace trimmattu).
    *
    * @param {string[]} nimet - Taulukko nimistä, jotka halutaan tarkistaa.
-   * @returns {boolean} - true, jos kaikki nimet ovat uniikkeja; muuten false.
+   * @returns {boolean} - true, jos kaikki nimet ovat uniikkeja, muuten false.
    */
   function ovatkoNimetUniikkeja(nimet) {
     const nimetSet = new Set();  // Luodaan Set uniikkien nimien tallennukseen
@@ -575,9 +574,8 @@ let start = function(data) {
 
 
   /**
-   * Tarkistaa lomakkeen jäsenkentät seuraavilla säännöillä:
-   * 1. Joukkueella on oltava vähintään kaksi jäsentä.
-   * 2. Jäsenet eivät voi olla samannimisiä.
+   * Tarkistaa lomakkeen jäsenkentät niin, että joukkueella on vähintään kaksi jäsentä
+   * ja jäsenet eivät ole samannimisiä
    *
    * @param {HTMLFormElement} lomake - Lomake-elementti, joka sisältää jäsenkentät.
    * @returns {boolean} - true, jos tarkistukset onnistuvat, muuten false
@@ -638,7 +636,7 @@ let start = function(data) {
     return true;
   }
 
-  poistaDuplikaattiLeimaustavat(data);
+  // poistaDuplikaattiLeimaustavat(data);
 
   const lomake = document.forms[0];
   const leimaustapaLomake = document.forms[1];
